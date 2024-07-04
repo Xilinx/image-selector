@@ -28,9 +28,23 @@
 ******************************************************************************/
 
 /***************************** Include Files *********************************/
-#include "xis_main.h"
+#include "xis_config.h"
 #include "psu_init.h"
-#include "xis_common.h"
+#include "xis_plat.h"
+#include "xis_uart.h"
+
+
+#if defined(XIS_GET_BOARD_PARAMS)
+#include "xis_singleimage.h"
+#endif
+
+#if defined(XIS_UPDATE_A_B_MECHANISM)
+#include "xis_qspi.h"
+#include "xis_update_a_b.h"
+#if defined(XPAR_XGPIOPS_NUM_INSTANCES)
+#include "xis_gpio.h"
+#endif
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -43,6 +57,7 @@
 /************************** Variable Definitions *****************************/
 
 /************************** Function Definitions *****************************/
+
 /*****************************************************************************/
 /**
 * This is the ImgSel main function and is implemented to support
@@ -75,12 +90,12 @@ int main(void)
 	}
 #endif
 
-	XIs_Printf(DEBUG_PRINT_ALWAYS, "Image Selector boot Started\r\n");
+	XIs_Printf(XIS_DEBUG_PRINT_ALWAYS, "Image Selector boot Started\r\n");
 
 #if defined(XIS_GET_BOARD_PARAMS)
 	Status = XIs_ImageSelBoardParam();
 	if (Status != XST_SUCCESS) {
-		XIs_Printf(DEBUG_GENERAL, "Single Image Multiboot"
+		XIs_Printf(XIS_DEBUG_GENERAL, "Single Image Multiboot"
 							"value update failed\r\n");
 		goto END;
 	}
@@ -88,7 +103,7 @@ int main(void)
 #if defined(XPAR_XGPIOPS_NUM_INSTANCES)
 	Status = GpioInit();
 	if(Status != XST_SUCCESS) {
-		XIs_Printf(DEBUG_GENERAL, "Gpio Init Failed\r\n");
+		XIs_Printf(XIS_DEBUG_GENERAL, "Gpio Init Failed\r\n");
 	}
 	GpioStatus = GetGpioStatus();
 	if(GpioStatus == 0U) {
@@ -97,10 +112,9 @@ int main(void)
 		goto END;
 	}
 #endif
-	XIs_ClockConfigs();
 	Status = XIs_UpdateABMultiBootValue();
 	if (Status != XST_SUCCESS) {
-		XIs_Printf(DEBUG_GENERAL, "A/B Image Multiboot"
+		XIs_Printf(XIS_DEBUG_GENERAL, "A/B Image Multiboot"
 							" value update failed\r\n");
 		goto END;
 	}

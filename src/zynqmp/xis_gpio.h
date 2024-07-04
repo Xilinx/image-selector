@@ -30,7 +30,7 @@ extern "C" {
 #endif
 
 /***************************** Include Files *********************************/
-#include "xis_main.h"
+#include "xis_config.h"
 
 #if defined(XIS_UPDATE_A_B_MECHANISM) && defined(XPAR_XGPIOPS_NUM_INSTANCES)
 #include "xgpiops.h"

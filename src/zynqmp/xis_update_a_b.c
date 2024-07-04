@@ -29,8 +29,9 @@
 ******************************************************************************/
 
 /***************************** Include Files *********************************/
-#include "xis_main.h"
-#include "xis_common.h"
+#include "xis_update_a_b.h"
+#include "xis_qspi.h"
+#include "xis_plat.h"
 
 #ifdef XIS_UPDATE_A_B_MECHANISM
 /************************** Constant Definitions *****************************/
@@ -89,20 +90,20 @@ static int XIs_DataValidations(u8 *ReadDataBuffer)
 
 	if(PersRegData[XIS_IDENTIFICATION_STRING_OFFSET] !=
 								XIS_IDENTIFICATION_STRING) {
-		XIs_Printf(DEBUG_GENERAL, "Identification String:%x\r\n",
+		XIs_Printf(XIS_DEBUG_GENERAL, "Identification String:%x\r\n",
 						PersRegData[XIS_IDENTIFICATION_STRING_OFFSET]);
 		Status = XIS_IDEN_STRING_MISMATCH_ERROR;
 		goto END;
 	}
 	if(PersRegData[XIS_LENGTH_OFFSET / 4U] != XIS_LENGTH_OF_REGISTERS) {
-		XIs_Printf(DEBUG_GENERAL, "Length:%x\r\n",
+		XIs_Printf(XIS_DEBUG_GENERAL, "Length:%x\r\n",
 									PersRegData[XIS_LENGTH_OFFSET / 4U]);
 		Status = XIS_REGISTERS_LENGTH_MISMATCH_ERROR;
 		goto END;
 	}
 	ChkSum = XIs_CheckSumCalculation(PersRegData, (u8)FALSE);
 	if(ChkSum != PersRegData[XIS_CHECKSUM_OFFSET / 4U]) {
-		XIs_Printf(DEBUG_GENERAL, "Chksum:%08x", ChkSum);
+		XIs_Printf(XIS_DEBUG_GENERAL, "Chksum:%08x", ChkSum);
 		Status = XIS_CHECKSUM_MISMATCH_ERROR;
 		goto END;
 	}
@@ -129,7 +130,7 @@ int XIs_IsImageExist(u32 PartitionAddr)
 
 	Status = XIs_QspiRead(PartitionAddr, (u8 *)DataBuff, XIS_SIZE_256B);
 	if (Status != XST_SUCCESS) {
-		XIs_Printf(DEBUG_GENERAL, "QSPI Read failed\r\n");
+		XIs_Printf(XIS_DEBUG_GENERAL, "QSPI Read failed\r\n");
 		goto END;
 	}
 
@@ -166,19 +167,19 @@ int XIs_UpdateABMultiBootValue(void)
 
 	Status = XIs_QspiInit();
 	if (Status != XST_SUCCESS) {
-		XIs_Printf(DEBUG_GENERAL, "QSPI Init failed\r\n");
+		XIs_Printf(XIS_DEBUG_GENERAL, "QSPI Init failed\r\n");
 		goto END;
 	}
 
 	Status = XIs_QspiRead(XIS_PERS_REGISTER_BASE_ADDRESS,
 					(u8 *)ReadDataBuffer, XIS_SIZE_256B);
 	if (Status != XST_SUCCESS) {
-		XIs_Printf(DEBUG_GENERAL, "QSPI Read failed\r\n");
+		XIs_Printf(XIS_DEBUG_GENERAL, "QSPI Read failed\r\n");
 		goto END;
 	}
 	Status = XIs_DataValidations(ReadDataBuffer);
 	if(Status != XST_SUCCESS) {
-		XIs_Printf(DEBUG_GENERAL, "Data Validations Failed\r\n");
+		XIs_Printf(XIS_DEBUG_GENERAL, "Data Validations Failed\r\n");
 		goto END;
 	}
 
@@ -198,7 +199,7 @@ int XIs_UpdateABMultiBootValue(void)
 			PerstRegPtr = (u32 *)&ReadDataBuffer[XIS_IMAGE_B_OFFSET];
 			Status = XIs_IsImageExist(*PerstRegPtr);
 			if(Status != XST_SUCCESS) {
-				XIs_Printf(DEBUG_GENERAL, "Image does not exist in Partition B, Launching Image recovery\r\n");
+				XIs_Printf(XIS_DEBUG_GENERAL, "Image does not exist in Partition B, Launching Image recovery\r\n");
 				goto RCRY;
 			}
 		}
@@ -209,7 +210,7 @@ int XIs_UpdateABMultiBootValue(void)
 			PerstRegPtr = (u32 *)&ReadDataBuffer[XIS_IMAGE_A_OFFSET];
 			Status = XIs_IsImageExist(*PerstRegPtr);
 			if(Status != XST_SUCCESS) {
-				XIs_Printf(DEBUG_GENERAL, "Image does not exist in Partition A, Launching Image recovery\r\n");
+				XIs_Printf(XIS_DEBUG_GENERAL, "Image does not exist in Partition A, Launching Image recovery\r\n");
 				goto RCRY;
 			}
 		}
@@ -220,7 +221,7 @@ int XIs_UpdateABMultiBootValue(void)
 				PerstRegPtr = (u32 *)&ReadDataBuffer[XIS_IMAGE_A_OFFSET];
 				Status = XIs_IsImageExist(*PerstRegPtr);
 				if(Status != XST_SUCCESS) {
-					XIs_Printf(DEBUG_GENERAL, "Image does not exist in Partition A, Launching Image recovery\r\n");
+					XIs_Printf(XIS_DEBUG_GENERAL, "Image does not exist in Partition A, Launching Image recovery\r\n");
 					goto RCRY;
 				}
 			}
@@ -229,7 +230,7 @@ int XIs_UpdateABMultiBootValue(void)
 				PerstRegPtr = (u32 *)&ReadDataBuffer[XIS_IMAGE_B_OFFSET];
 				Status = XIs_IsImageExist(*PerstRegPtr);
 				if(Status != XST_SUCCESS) {
-					XIs_Printf(DEBUG_GENERAL, "Image does not exist in Partition B, Launching Image recovery\r\n");
+					XIs_Printf(XIS_DEBUG_GENERAL, "Image does not exist in Partition B, Launching Image recovery\r\n");
 					goto RCRY;
 				}
 			}
@@ -248,7 +249,7 @@ int XIs_UpdateABMultiBootValue(void)
 		Status = XIs_QspiWrite(XIS_PERS_REGISTER_BASE_ADDRESS,
 						(u8 *)ReadDataBuffer, XIS_SIZE_256B);
 		if(Status != XST_SUCCESS) {
-			XIs_Printf(DEBUG_GENERAL, "QSPI Last image booted"
+			XIs_Printf(XIS_DEBUG_GENERAL, "QSPI Last image booted"
                                   " Write failed\r\n");
 			goto END;
 		}
@@ -256,7 +257,7 @@ int XIs_UpdateABMultiBootValue(void)
 		Status = XIs_QspiWrite(XIS_PERS_REGISTER_BACKUP_ADDRESS,
 						(u8 *)ReadDataBuffer, XIS_SIZE_256B);
 		if(Status != XST_SUCCESS) {
-			XIs_Printf(DEBUG_GENERAL, "QSPI Last image booted"
+			XIs_Printf(XIS_DEBUG_GENERAL, "QSPI Last image booted"
                                   " Backup Write failed\r\n");
 			goto END;
 		}

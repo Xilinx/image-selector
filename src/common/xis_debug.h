@@ -18,6 +18,8 @@
 * ----- ---- -------- ---------------------------------------------------------
 * 1.00  Ana  07/02/20 First release
 * 2.00  sd   05/17/24 Removed redundant macro
+* 2.01  sd   06/04/24 Moved to common directory
+*
 * </pre>
 *
 ******************************************************************************/
@@ -38,7 +40,7 @@ extern "C" {
 /**************************** Type Definitions *******************************/
 
 /***************** Macros (Inline Functions) Definitions *********************/
-#define XIS_PRINT_VAL			(1U)
+#define XIS_PRINT_VAL			(0U)
 #define XIS_DEBUG_VAL			(0U)
 #define XIS_DEBUG_DETAILED_VAL	(0U)
 

@@ -28,7 +28,7 @@
 ******************************************************************************/
 
 /***************************** Include Files *********************************/
-#include "xis_main.h"
+#include "xis_gpio.h"
 
 #if defined(XIS_UPDATE_A_B_MECHANISM) && defined(XPAR_XGPIOPS_NUM_INSTANCES)
 /************************** Constant Definitions *****************************/

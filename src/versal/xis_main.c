@@ -27,11 +27,13 @@
 /***************************** Include Files *********************************/
 #include "xis_config.h"
 #include "xis_i2c.h"
+#include "xis_singleimage.h"
 #include "xis_pm.h"
 #include "xis_proc.h"
 #include "xis_loader.h"
 #include "xis_module.h"
 #include "xplmi.h"
+#include "xis_plat.h"
 
 /************************** Constant Definitions *****************************/
 
@@ -79,6 +81,15 @@ int main(void)
 	}
 
 	Status = XIs_ImageSelBoardParam();
+	if (Status != XST_SUCCESS) {
+		goto END;
+	}
+
+	XIs_Softreset();
+
+	while(1U) {
+		;
+	}
 
 END:
 	/* Control should never reach here */

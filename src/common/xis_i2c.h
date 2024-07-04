@@ -1,6 +1,6 @@
 /******************************************************************************
-* Copyright (c) 2022 Xilinx, Inc. All rights reserved.
-* Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
+* Copyright (c) 2020-2022 Xilinx, Inc. All rights reserved.
+* Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 * SPDX-License-Identifier: MIT
 ******************************************************************************/
 
@@ -16,7 +16,8 @@
 *
 * Ver   Who  Date     Changes
 * ----- ---- -------- ---------------------------------------------------------
-* 1.00  skd  01/13/23 Initial release
+* 1.00  Ana  07/02/20 First release
+* 2.00  sd   06/04/24 Moved to common directory
 *
 * </pre>
 *
@@ -30,15 +31,12 @@ extern "C" {
 #endif
 
 /***************************** Include Files *********************************/
+#include "xis_config.h"
+
 #ifdef XIS_GET_BOARD_PARAMS
 #include "xiicps.h"
 
 /************************** Variable Definitions *****************************/
-typedef struct board
-{
-    char *Name; /* Name of the board */
-    int Offset; /* Multiboot Offset value */
-} Boards_List;
 
 /**************************** Type Definitions *******************************/
 /*
@@ -48,15 +46,9 @@ typedef struct board
 typedef u16 AddressType;
 
 /***************** Macros (Inline Functions) Definitions *********************/
-/* Board Parameters will present at 0x16 Address location
- * for VCK190, VPK120, VPK180 and VMK180 boards
- */
-#define XIS_EEPROM_BOARD_ADDR_OFFSET			(0x00U)
-#define XIS_EEPROM_OFFSET_1_WRITE_BYTES   		(0x1U)
-#define XIS_EEPROM_OFFSET_2_WRITE_BYTES  		(0x2U)
+#define XIS_EEPROM_OFFSET_1_WRITE_BYTES   		(0x01U)
+#define XIS_EEPROM_OFFSET_2_WRITE_BYTES  		(0x02U)
 #define XIS_IIC_SCLK_RATE						(100000U)
-#define XIS_PAGE_SIZE_16						(32U)
-#define XIS_DELAY								(10000U)
 #define XIS_MAX_SIZE							(0x100)
 
 /************************** Function Prototypes ******************************/
@@ -66,7 +58,6 @@ typedef u16 AddressType;
 int XIs_IicPsMuxInit(void);
 int XIs_EepromReadData(u8 *BufferPtr, u16 ReadAddress,
 						u16 ByteCount, u32 WrBfrOffset);
-int XIs_ImageSelBoardParam(void);
 
 #endif /* end of XIS_GET_BOARD_PARAMS */
 

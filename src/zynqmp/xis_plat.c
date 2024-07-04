@@ -6,7 +6,7 @@
 
 /*****************************************************************************/
 /**
-* @file xis_common.c
+* @file xis_plat.c
 *
 * This is the file which contains error update functionality,
 * multiboot value update functionality and soft reset functionality
@@ -28,11 +28,19 @@
 ******************************************************************************/
 
 /***************************** Include Files *********************************/
-#include "xis_common.h"
+#include "xis_plat.h"
 
 /************************** Function Prototypes ******************************/
 
 /************************** Variable Definitions *****************************/
+Boards_List Board[XIS_MAX_BOARDS] = {
+	{"ZCU102" , 1020U},
+	{"ZCU104" , 1040U},
+	{"ZCU106" , 1060U},
+	{"ZCU111" , 1110U},
+	{"ZCU208" , 2080U},
+	{"ZCU216" , 2160U}
+};
 
 /************************** Function Definitions *****************************/
 
@@ -78,30 +86,30 @@ void XIs_UpdateError(int Error)
 	XIs_Out32(XIS_ERROR_STATUS_REGISTER_OFFSET, ((u32)Error << 16U));
 }
 
-
-/**********************************************************************
-*******/
+/*****************************************************************************/
 /**
- * This function will do Clock Configurations.
+ * This function returns board name from supported board list.
  *
- * @param	None.
+ * @param	Index
  *
- * @return	None.
+ * @return	Board name
  *
-***********************************************************************
-*******/
-void XIs_ClockConfigs(void)
+ ******************************************************************************/
+char * XIs_GetBoardList(u8 Index)
 {
-	/**
-	*SRCSEL = IOPLL, DIVISOR0 = 0xA, CLKACT = 0x1
-	*/
-	Xil_UtilRMW32(XIS_CRL_APB_TIMESTAMP_REF_CTRL_OFFSET,
-			XIS_CRL_APB_TIMESTAMP_MASK, XIS_CRL_APB_TIMESTAMP_VALUE);
+	return Board[Index].Name;
+}
 
-	/**
-	*TimeStamp controller bit is cleared, to bring it out of reset.
-	*/
-	Xil_UtilRMW32(XIS_CRL_APB_RST_LPD_IOU2_OFFSET,
-			XIS_CRL_APB_RST_LPD_IOU2_MASK, XIS_CRL_APB_RST_LPD_IOU2_VALUE);
-
+/*****************************************************************************/
+/**
+ * This function returns board offset value from supported board list.
+ *
+ * @param	Index
+ *
+ * @return	Board offset value
+ *
+ ******************************************************************************/
+u32 XIs_GetBoardOffset(u8 Index)
+{
+	return Board[Index].Offset;
 }

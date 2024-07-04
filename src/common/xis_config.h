@@ -1,6 +1,6 @@
 /******************************************************************************
 * Copyright (c) 2020-2022 Xilinx, Inc. All rights reserved.
-* Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
+* Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 * SPDX-License-Identifier: MIT
 ******************************************************************************/
 
@@ -17,8 +17,9 @@
 * Ver   Who  Date     Changes
 * ----- ---- -------- ---------------------------------------------------------
 * 1.00  Ana  06/24/20 First release
-* 1.01  td   06/10/21 Added check to ensure board param option is only enabled
+* 2.00  td   06/10/21 Added check to ensure board param option is only enabled
 *                     when UPDATE_A_B option is disabled and vice-versa
+* 3.00  sd   06/04/24 Moved to common directory
 *
 * </pre>
 *
@@ -32,7 +33,10 @@ extern "C" {
 #endif
 
 /***************************** Include Files *********************************/
-
+#include "xparameters.h"
+#include "xil_types.h"
+#include "xis_debug.h"
+#include "xis_error.h"
 /************************** Constant Definitions *****************************/
 
 /**************************** Type Definitions *******************************/

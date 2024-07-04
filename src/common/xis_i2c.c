@@ -1,34 +1,32 @@
 /******************************************************************************
-* Copyright (c) 2022 Xilinx, Inc. All rights reserved.
-* Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+* Copyright (c) 2020 - 2022 Xilinx, Inc. All rights reserved.
+* Copyright (c) 2022 - 2024 Advanced Micro Devices, Inc. All Rights Reserved.
 * SPDX-License-Identifier: MIT
 ******************************************************************************/
 
 /*****************************************************************************/
 /**
-* @file xis_i2c.c
-*
-* This file used to Read the Board Name from IIC EEPROM. Based on the Board
-* name, multiboot offset value will get updated.
-*
-* <pre>
-* MODIFICATION HISTORY:
-*
-* Ver   Who  Date     Changes
-* ----- ---- -------- ---------------------------------------------------------
-* 1.00  skd  01/13/23 Initial release
-* 2.00  sd   05/17/24 Add SDT support
-*
-* </pre>
-*
-******************************************************************************/
+ * @file xis_i2c.c
+ *
+ * This file used to Read the Board Name from IIC EEPROM from 0xD0 location, Based
+ * on the Board Name it will update the corresponding multiboot offset value.
+ *
+ *
+ * <pre>
+ * MODIFICATION HISTORY:
+ *
+ * Ver   Who  Date     Changes
+ * ----- ---- -------- ---------------------------------------------------------
+ * 1.00  Ana  07/02/20 First release
+ * 2.00  sd   02/15/24 Removed delay function
+ * 3.00  sd   05/17/24 Add SDT support
+ * 4.00  sd   06/04/24 Moved to common directory
+ * </pre>
+ *
+ ******************************************************************************/
 
 /***************************** Include Files *********************************/
-#include "xis_config.h"
 #include "xis_i2c.h"
-#include "xis_error.h"
-#include "xplmi_debug.h"
-
 
 #ifdef XIS_GET_BOARD_PARAMS
 /************************** Constant Definitions *****************************/
@@ -36,12 +34,19 @@
 /**************************** Type Definitions *******************************/
 
 /***************** Macros (Inline Functions) Definitions *********************/
+#if (XPAR_XIICPS_NUM_INSTANCES == 2U && XPAR_XIICPS_1_BASEADDR == 0xFF030000)
+#ifndef SDT
+#define XIS_I2C_EEPROM_DEVICE (1U)
+#else
+#define XIS_I2C_EEPROM_DEVICE (XPAR_XIICPS_1_BASEADDR)
+#endif
+#else
 #ifndef SDT
 #define XIS_I2C_EEPROM_DEVICE (0U)
 #else
 #define XIS_I2C_EEPROM_DEVICE (XPAR_XIICPS_0_BASEADDR)
 #endif
-
+#endif
 /************************** Function Prototypes ******************************/
 
 /************************** Variable Definitions *****************************/
@@ -256,10 +261,6 @@ int XIs_IicPsMuxInit(void)
 	}
 
 	Status = XIs_MuxInitChannel(XIS_MUX_ADDR, XIS_I2C_MUX_INDEX);
-	if (Status != XST_SUCCESS) {
-		XIs_Printf(XIS_DEBUG_PRINT_ALWAYS,"Ignore this error only for VEK280\r\n");
-		Status = XST_SUCCESS;
-	}
 
 END:
 	return Status;

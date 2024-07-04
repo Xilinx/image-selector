@@ -24,7 +24,8 @@
  ******************************************************************************/
 
 /***************************** Include Files *********************************/
-#include "xis_main.h"
+#include "xis_uart.h"
+
 #if defined(XIS_UART_ENABLE) && defined(STDOUT_BASEADDRESS)
 #include "xuartps.h"
 

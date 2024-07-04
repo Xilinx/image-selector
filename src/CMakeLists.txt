@@ -40,11 +40,13 @@ endif()
 collector_create (PROJECT_LIB_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}")
 collector_create (PROJECT_LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}")
 
+add_subdirectory(common)
+
 if("${CMAKE_MACHINE}" STREQUAL "Versal")
   add_subdirectory(versal)
 elseif("${CMAKE_MACHINE}" STREQUAL "ZynqMP")
   add_subdirectory(zynqmp)
-  if("${DEVICE_ID}" STREQUAL "xck26")
+  if(("${DEVICE_ID}" STREQUAL "xck26") OR ("${DEVICE_ID}" STREQUAL "xck24"))
     ADD_DEFINITIONS(-DXIS_UPDATE_A_B_MECHANISM)
   else()
     ADD_DEFINITIONS(-DXIS_GET_BOARD_PARAMS)
@@ -58,6 +60,8 @@ string(APPEND CMAKE_CXX_LINK_FLAGS ${USER_LINK_OPTIONS})
 
 collector_list (_sources PROJECT_LIB_SOURCES)
 collector_list (_headers PROJECT_LIB_HEADERS)
+
+file(COPY ${_headers} DESTINATION ${CMAKE_BINARY_DIR}/include)
 
 if("${CMAKE_MACHINE}" STREQUAL "Versal")
   add_executable(${APP_NAME}.elf ${_sources})
