@@ -56,7 +56,7 @@ extern "C" {
  * it will update the multiboot value
  *
  */
-//#define XIS_UPDATE_A_B_MECHANISM
+#define XIS_UPDATE_A_B_MECHANISM
 //#define XIS_UART_ENABLE
 #ifdef XPAR_XIICPS_NUM_INSTANCES
 #ifndef XIS_UPDATE_A_B_MECHANISM
