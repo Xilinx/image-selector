@@ -260,7 +260,7 @@ int XIs_IicPsMuxInit(void)
 		goto END;
 	}
 
-	Status = XIs_MuxInitChannel(XIS_MUX_ADDR, XIS_I2C_MUX_INDEX);
+	XIs_MuxInitChannel(XIS_MUX_ADDR, XIS_I2C_MUX_INDEX);
 
 END:
 	return Status;

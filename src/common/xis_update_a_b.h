@@ -42,8 +42,6 @@ extern "C" {
 
 /***************** Macros (Inline Functions) Definitions *********************/
 
-#define XIS_PERS_REGISTER_BASE_ADDRESS				(0x100000U)
-#define XIS_PERS_REGISTER_BACKUP_ADDRESS			(0x120000U)
 #define XIS_SIZE_256B								(256U)
 #define XIS_IMAGE_A									(0U)
 #define XIS_IMAGE_B									(1U)
@@ -59,10 +57,6 @@ extern "C" {
 #define XIS_IMAGE_A_OFFSET 							(0x14U)
 #define XIS_IMAGE_B_OFFSET 							(0x18U)
 #define XIS_RECOVERY_IMAGE_OFFSET 					(0x1CU)
-#define XIS_XLNX_LENGTH								(0x4U)
-#define XIS_XLNX_OFFSET								(0x24U)
-#define XIS_RECOVERY_ADDRESS						(0x01E00000U)
-#define XIS_SIZE_32KB								(32768U)
 
 /************************** Function Prototypes ******************************/
 

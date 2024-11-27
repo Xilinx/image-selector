@@ -30,7 +30,14 @@
 
 /***************************** Include Files *********************************/
 #include "xis_update_a_b.h"
+#ifdef XIS_QSPI_FLSH
 #include "xis_qspi.h"
+#elif defined XIS_OSPI_FLSH
+#include "xis_ospi.h"
+#endif
+#ifdef XIS_VERSAL_PLAT
+#include "xplmi.h"
+#endif
 #include "xis_plat.h"
 
 #ifdef XIS_UPDATE_A_B_MECHANISM
@@ -126,9 +133,13 @@ END:
 int XIs_IsImageExist(u32 PartitionAddr)
 {
 	int Status = XST_FAILURE;
-	u8 DataBuff[XIS_SIZE_256B] __attribute__ ((aligned(32U)));
+	u8 DataBuff[XIS_SIZE_1KB] __attribute__ ((aligned(32U)));
 
-	Status = XIs_QspiRead(PartitionAddr, (u8 *)DataBuff, XIS_SIZE_256B);
+#ifdef XIS_QSPI_FLSH
+	Status = XIs_QspiRead(PartitionAddr, (u8 *)DataBuff, XIS_SIZE_1KB);
+#elif defined XIS_OSPI_FLSH
+	Status = XIs_OspiRead(PartitionAddr, (u8 *)DataBuff, XIS_SIZE_1KB);
+#endif
 	if (Status != XST_SUCCESS) {
 		XIs_Printf(XIS_DEBUG_GENERAL, "QSPI Read failed\r\n");
 		goto END;
@@ -163,16 +174,15 @@ int XIs_UpdateABMultiBootValue(void)
 	u32 *PerstRegPtr;
 	u32 Offset;
 	u8 CurrentImage;
-	u8 ReadDataBuffer[XIS_SIZE_256B] __attribute__ ((aligned(32U)));
+	u8 ReadDataBuffer[XIS_SIZE_1KB] __attribute__ ((aligned(32U)));
 
-	Status = XIs_QspiInit();
-	if (Status != XST_SUCCESS) {
-		XIs_Printf(XIS_DEBUG_GENERAL, "QSPI Init failed\r\n");
-		goto END;
-	}
-
-	Status = XIs_QspiRead(XIS_PERS_REGISTER_BASE_ADDRESS,
-					(u8 *)ReadDataBuffer, XIS_SIZE_256B);
+#ifdef XIS_QSPI_FLSH
+	Status = XIs_QspiRead(XIS_MDATA_OFFSET,
+					(u8 *)ReadDataBuffer, XIS_SIZE_1KB);
+#elif defined XIS_OSPI_FLSH
+	Status = XIs_OspiRead(XIS_MDATA_OFFSET,
+					(u8 *)ReadDataBuffer, XIS_SIZE_1KB);
+#endif
 	if (Status != XST_SUCCESS) {
 		XIs_Printf(XIS_DEBUG_GENERAL, "QSPI Read failed\r\n");
 		goto END;
@@ -246,16 +256,26 @@ int XIs_UpdateABMultiBootValue(void)
 	if(ReadDataBuffer[XIS_LAST_BOOTED_IMAGE] != CurrentImage) {
 		ReadDataBuffer[XIS_LAST_BOOTED_IMAGE] = CurrentImage;
 		(void)XIs_CheckSumCalculation((u32*)ReadDataBuffer, (u8)TRUE);
-		Status = XIs_QspiWrite(XIS_PERS_REGISTER_BASE_ADDRESS,
-						(u8 *)ReadDataBuffer, XIS_SIZE_256B);
+#ifdef XIS_QSPI_FLSH
+		Status = XIs_QspiWrite(XIS_MDATA_OFFSET,
+						(u8 *)ReadDataBuffer, XIS_SIZE_1KB);
+#elif defined XIS_OSPI_FLSH
+		Status = XIs_OspiWrite(XIS_MDATA_OFFSET,
+						(u8 *)ReadDataBuffer, XIS_SIZE_1KB);
+#endif
 		if(Status != XST_SUCCESS) {
 			XIs_Printf(XIS_DEBUG_GENERAL, "QSPI Last image booted"
                                   " Write failed\r\n");
 			goto END;
 		}
 
-		Status = XIs_QspiWrite(XIS_PERS_REGISTER_BACKUP_ADDRESS,
-						(u8 *)ReadDataBuffer, XIS_SIZE_256B);
+#ifdef XIS_QSPI_FLSH
+		Status = XIs_QspiWrite(XIS_MDATA_BKP_OFFSET,
+						(u8 *)ReadDataBuffer, XIS_SIZE_1KB);
+#elif defined XIS_OSPI_FLSH
+		Status = XIs_OspiWrite(XIS_MDATA_BKP_OFFSET,
+						(u8 *)ReadDataBuffer, XIS_SIZE_1KB);
+#endif
 		if(Status != XST_SUCCESS) {
 			XIs_Printf(XIS_DEBUG_GENERAL, "QSPI Last image booted"
                                   " Backup Write failed\r\n");

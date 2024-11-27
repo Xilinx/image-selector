@@ -109,7 +109,7 @@ int XIs_ImageSelBoardParam(void)
 		goto END;
 	}
 
-#ifdef VERSAL
+#ifdef XIS_VERSAL_PLAT
 	sleep(1);
 	XIs_Printf(XIS_DEBUG_PRINT_ALWAYS, "***********Versal Image Selector***********\n\r");
 #endif
@@ -131,7 +131,7 @@ int XIs_ImageSelBoardParam(void)
 	XIs_Printf(XIS_DEBUG_PRINT_ALWAYS, "Board offset: %x\r\n", BoardOffset);
 
 
-#ifdef VERSAL
+#ifdef XIS_VERSAL_PLAT
 	XIs_Printf(XIS_DEBUG_PRINT_ALWAYS, "*******************************************\n\r");
 	sleep(1);
 #endif

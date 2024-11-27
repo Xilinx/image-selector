@@ -40,9 +40,9 @@ extern "C" {
 /**************************** Type Definitions *******************************/
 
 /***************** Macros (Inline Functions) Definitions *********************/
-#define XIS_PRINT_VAL			(0U)
+#define XIS_PRINT_VAL			(1U)
 #define XIS_DEBUG_VAL			(0U)
-#define XIS_DEBUG_DETAILED_VAL	(0U)
+#define XIS_DEBUG_DETAILED_VAL	(1U)
 
 /**
  * ImgSel Debug options

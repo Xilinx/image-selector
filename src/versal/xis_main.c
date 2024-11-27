@@ -35,12 +35,26 @@
 #include "xplmi.h"
 #include "xis_plat.h"
 
+#ifdef XIS_UPDATE_A_B_MECHANISM
+	#ifdef XIS_FWU_UPDATE
+		#include "xis_boot_a_b.h"
+	#else
+		#include "xis_update_a_b.h"
+	#endif
+	#ifdef XIS_QSPI_FLSH
+		#include "xis_qspi.h"
+	#elif defined XIS_OSPI_FLSH
+		#include "xis_ospi.h"
+	#endif
+#endif
+
 /************************** Constant Definitions *****************************/
 
 /**************************** Type Definitions *******************************/
 
 /***************** Macros (Inline Functions) Definitions *********************/
-
+#define XIS_IMAGESEL_MAJOR_VER 0x1
+#define XIS_IMAGESEL_MINOR_VER 0x0
 /************************** Function Prototypes ******************************/
 static int XPlm_Init(void);
 
@@ -80,11 +94,47 @@ int main(void)
 		goto END;
 	}
 
+	sleep(1);
+	XIs_Printf(XIS_DEBUG_PRINT_ALWAYS, "ImageSelector Version: %x.%x\r\n"
+					,XIS_IMAGESEL_MAJOR_VER, XIS_IMAGESEL_MINOR_VER );
+
+#if defined (XIS_GET_BOARD_PARAMS)
 	Status = XIs_ImageSelBoardParam();
 	if (Status != XST_SUCCESS) {
 		goto END;
 	}
+#elif defined(XIS_UPDATE_A_B_MECHANISM)
+#ifdef XIS_QSPI_FLSH
+	Status = XIs_QspiInit();
+	if (Status != XST_SUCCESS) {
+		XIs_Printf(XIS_DEBUG_GENERAL, "QSPI Init failed\r\n");
+		goto END;
+	}
+#elif defined XIS_OSPI_FLSH
+	Status = XIs_OspiInit();
+	if (Status != XST_SUCCESS) {
+		XIs_Printf(XIS_DEBUG_GENERAL, "OSPI Init failed\r\n");
+		goto END;
+	}
+#endif
+#ifdef XIS_FWU_UPDATE
+	Status = XIs_BootABImageBank();
+	if (Status != XST_SUCCESS) {
+		XIs_Printf(XIS_DEBUG_GENERAL, "FWU A/B Bank selection"
+					" failed\r\n");
+		goto END;
+	}
+#else
+	Status = XIs_UpdateABMultiBootValue();
+	if (Status != XST_SUCCESS) {
+		XIs_Printf(XIS_DEBUG_GENERAL, "A/B Image Multiboot"
+							" value update failed\r\n");
+		goto END;
+	}
+#endif
+#endif
 
+	sleep(1);
 	XIs_Softreset();
 
 	while(1U) {

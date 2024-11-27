@@ -40,7 +40,11 @@
 
 #if defined(XIS_UPDATE_A_B_MECHANISM)
 #include "xis_qspi.h"
+#ifdef XIS_FWU_UPDATE
+#include "xis_boot_a_b.h"
+#else
 #include "xis_update_a_b.h"
+#endif
 #if defined(XPAR_XGPIOPS_NUM_INSTANCES)
 #include "xis_gpio.h"
 #endif
@@ -100,6 +104,11 @@ int main(void)
 		goto END;
 	}
 #elif defined(XIS_UPDATE_A_B_MECHANISM)
+	Status = XIs_QspiInit();
+	if (Status != XST_SUCCESS) {
+		XIs_Printf(XIS_DEBUG_GENERAL, "QSPI Init failed\r\n");
+		goto END;
+	}
 #if defined(XPAR_XGPIOPS_NUM_INSTANCES)
 	Status = GpioInit();
 	if(Status != XST_SUCCESS) {
@@ -112,12 +121,21 @@ int main(void)
 		goto END;
 	}
 #endif
+#ifdef XIS_FWU_UPDATE
+	Status = XIs_BootABImageBank();
+	if (Status != XST_SUCCESS) {
+		XIs_Printf(XIS_DEBUG_GENERAL, "FWU A/B Bank selection"
+					" failed\r\n");
+		goto END;
+	}
+#else
 	Status = XIs_UpdateABMultiBootValue();
 	if (Status != XST_SUCCESS) {
 		XIs_Printf(XIS_DEBUG_GENERAL, "A/B Image Multiboot"
 							" value update failed\r\n");
 		goto END;
 	}
+#endif
 #else
 	MultiBootVal = XIs_In32(XIS_CSU_MULTI_BOOT);
 	(void)XIs_UpdateMultiBootValue(MultiBootVal + 1U);
