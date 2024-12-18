@@ -517,12 +517,12 @@ static int XIs_FlashReadID(XOspiPsv *OspiPsvPtr)
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
-	XIs_Printf(XIS_DEBUG_GENERAL, "FlashID = ");
+	XIs_Printf(XIS_DEBUG_INFO, "FlashID = ");
 	while (ReadIdBytes >= 0 ) {
-		XIs_Printf(XIS_DEBUG_GENERAL, "0x%x ", ReadBfrPtr[FlashMsg.ByteCount - ReadIdBytes]);
+		XIs_Printf(XIS_DEBUG_INFO, "0x%x ", ReadBfrPtr[FlashMsg.ByteCount - ReadIdBytes]);
 		ReadIdBytes--;
 	}
-	XIs_Printf(XIS_DEBUG_GENERAL, "\n\r");
+	XIs_Printf(XIS_DEBUG_INFO, "\n\r");
 
 	OspiPsvPtr->DeviceIdData = ((ReadBfrPtr[3] << 24) | (ReadBfrPtr[2] << 16) |
 				    (ReadBfrPtr[1] << 8) | ReadBfrPtr[0]);

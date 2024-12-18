@@ -111,7 +111,7 @@ static int XIs_FlashReadID(XQspiPsu *QspiPsuPtr)
 		goto END;
 	}
 
-	XIs_Printf(XIS_DEBUG_GENERAL, "FlashID=0x%x 0x%x 0x%x\n\r",
+	XIs_Printf(XIS_DEBUG_INFO, "FlashID=0x%x 0x%x 0x%x\n\r",
 			ReadDataBuffer[0U], ReadDataBuffer[1U], ReadDataBuffer[2U]);
 
 	/*
