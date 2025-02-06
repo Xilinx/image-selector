@@ -77,7 +77,7 @@ void XIs_ReadBootCnt(void)
 {
 	u32 BootCnt;
 
-	BootCnt = (XIs_In32(XIS_BOOTCNT_PERS_REG)&0xFFF);
+	BootCnt = (XIs_In32(XIS_PMC_GLOB_PERS_REG) >> XIS_BOOT_CNT_BYT) & 0xFF;
 	if(BootCnt > MaxBootCnt) {
 		BootCnt = XIs_SetBootCnt(XIS_DEFAULT_VAL);
 	}
@@ -95,7 +95,10 @@ void XIs_ReadBootCnt(void)
  ******************************************************************************/
 u32 XIs_ValidateBootCnt(void)
 {
-	if((XIs_In32(XIS_BOOTCNT_PERS_REG)&0xFFF) <= MaxBootCnt) {
+	u32 BootCnt;
+	BootCnt = (XIs_In32(XIS_PMC_GLOB_PERS_REG) >> XIS_BOOT_CNT_BYT) & 0xFF;
+
+	if(BootCnt <= MaxBootCnt) {
 		return XIS_TRUE;
 	} else {
 		return XIS_FALSE;
@@ -109,8 +112,14 @@ u32 XIs_ValidateBootCnt(void)
  * @return	none
  *
  ******************************************************************************/
-void XIs_ResetBootCnt(void) {
-	XIs_Out32(XIS_BOOTCNT_PERS_REG, XIS_BOOTCNT_MAGIC);
+void XIs_ResetBootCnt(void)
+{
+	u32 PerRegVal;
+	PerRegVal = XIs_In32(XIS_PMC_GLOB_PERS_REG);
+
+	PerRegVal = (PerRegVal & ~(0xFF << XIS_BOOT_CNT_BYT));
+
+	XIs_Out32(XIS_PMC_GLOB_PERS_REG, PerRegVal);
 }
 
 /*****************************************************************************/
@@ -120,8 +129,18 @@ void XIs_ResetBootCnt(void) {
  * @return	none
  *
  ******************************************************************************/
-void XIs_IncBootCnt(void) {
-	XIs_Out32(XIS_BOOTCNT_PERS_REG, (XIs_In32(XIS_BOOTCNT_PERS_REG)+1));
+void XIs_IncBootCnt(void)
+{
+	u32 PerRegVal;
+	u32 BootCnt;
+
+	BootCnt = (XIs_In32(XIS_PMC_GLOB_PERS_REG) >> XIS_BOOT_CNT_BYT) & 0xFF;
+	BootCnt++;
+
+	PerRegVal = XIs_In32(XIS_PMC_GLOB_PERS_REG);
+	PerRegVal = ((PerRegVal & ~(0xFF << XIS_BOOT_CNT_BYT)) | (BootCnt << XIS_BOOT_CNT_BYT));
+
+	XIs_Out32(XIS_PMC_GLOB_PERS_REG, PerRegVal);
 }
 
 /*****************************************************************************/
@@ -133,9 +152,20 @@ void XIs_IncBootCnt(void) {
  * @return	boot counter value
  *
  ******************************************************************************/
-u32 XIs_SetBootCnt(u32 set_val) {
-	XIs_Out32(XIS_BOOTCNT_PERS_REG, (XIS_BOOTCNT_MAGIC|set_val));
-	return (XIs_In32(XIS_BOOTCNT_PERS_REG)&0xFFF);
+u32 XIs_SetBootCnt(u32 set_val)
+{
+
+	u32 PerRegVal;
+	u32 BootCnt;
+
+	XIs_Out32(XIS_PMC_GLOB_PERS_REG, XIS_PMC_REG_MAGIC_NUM);
+
+	PerRegVal = XIs_In32(XIS_PMC_GLOB_PERS_REG);
+	PerRegVal = ((PerRegVal & ~(0xFF << XIS_BOOT_CNT_BYT)) | (set_val << XIS_BOOT_CNT_BYT));
+
+	BootCnt = (XIs_In32(XIS_PMC_GLOB_PERS_REG) >> XIS_BOOT_CNT_BYT) & 0xFF;
+
+	return BootCnt;
 }
 
 /*****************************************************************************/
@@ -400,7 +430,12 @@ u32 XIs_SearchOptionalData(u32 DataId, u32 *rollback_cnt)
 
 void XIs_UpdateBootPartReg(u32 bank_id)
 {
-	XIs_Out32(XIS_BOOTPART_PERS_REG, (XIS_BOOTPART_MAGIC | bank_id));
+	u32 PerRegVal;
+
+	PerRegVal = XIs_In32(XIS_PMC_GLOB_PERS_REG);
+	PerRegVal = ((PerRegVal & ~(0xFF << XIS_BOOT_PART_BYT)) | (bank_id << XIS_BOOT_PART_BYT));
+
+	XIs_Out32(XIS_PMC_GLOB_PERS_REG, PerRegVal);
 }
 
 /*****************************************************************************/
@@ -416,8 +451,13 @@ void XIs_UpdateBootPartReg(u32 bank_id)
 
 u32 XIs_UpdateRollbackReg(u32 counter_val)
 {
+
+	u32 PerRegVal;
+	PerRegVal = XIs_In32(XIS_PMC_GLOB_PERS_REG);
+	PerRegVal = ((PerRegVal & ~(0xFF << XIS_ROLLBACK_CNT_BYT)) | (counter_val << XIS_ROLLBACK_CNT_BYT));
+
 	if(counter_val < XIS_MAX_ROLLBACK_CNT){
-		XIs_Out32(XIS_ROLLBACK_PERS_REG, (XIS_ROLLBACK_MAGIC | counter_val));
+		XIs_Out32(XIS_PMC_GLOB_PERS_REG, PerRegVal);
 		return XST_SUCCESS;
 	} else {
 		XIs_Printf(XIS_DEBUG_GENERAL, "Rollback counter limit reached\r\n");
@@ -442,8 +482,8 @@ u32 XIs_IsTrialState(struct fwu_mdata *mdata)
 	u32 Status = XST_FAILURE;
 	u32 rollback_old, rollback_new;
 
-	if((XIs_In32(XIS_BOOTPART_PERS_REG)>>0x4) == (XIS_BOOTPART_MAGIC>>0x4)) {
-		if((XIs_In32(XIS_BOOTPART_PERS_REG)&(0xF)) != mdata->active_index) {
+	if((XIs_In32(XIS_PMC_GLOB_PERS_REG)>>XIS_MAGIC_VAL_BYT) == (XIS_PMC_REG_MAGIC_NUM>>XIS_MAGIC_VAL_BYT)) {
+		if(((XIs_In32(XIS_PMC_GLOB_PERS_REG) >> XIS_BOOT_PART_BYT) & 0xFF) != mdata->active_index) {
 			Status = XIs_ReadRollBackCnt(mdata, &rollback_old, mdata->previous_active_index);
 			if (Status != XST_SUCCESS) {
 				XIs_Printf(XIS_DEBUG_GENERAL, "Rollback counter old read failed\r\n");

@@ -40,10 +40,12 @@ extern "C" {
 #define XIS_BOOTCNT_SIZE            0x4
 
 /* Magic values*/
-#define XIS_BOOTCNT_MAGIC           0xB002C000
-#define XIS_BOOTPART_MAGIC          0xB0020FF0
-#define XIS_ROLLBACK_MAGIC          0x1D000000
-#define XIS_WDT_MAGIC               0xFEE1DEAD
+#define XIS_PMC_REG_MAGIC_NUM       0x1D000000
+
+#define XIS_MAGIC_VAL_BYT           0x18
+#define XIS_BOOT_CNT_BYT            0x10
+#define XIS_BOOT_PART_BYT           0x8
+#define XIS_ROLLBACK_CNT_BYT        0x0
 
 #define XIS_ACTIVE_INDEX            0x0
 #define XIS_PREV_ACTIVE_INDEX       0x1

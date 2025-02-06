@@ -61,18 +61,21 @@ extern "C" {
  *
  */
 
-#define XIS_UPDATE_A_B_MECHANISM
-#define XIS_FWU_UPDATE
-//#define XIS_QSPI_FLSH
-#define XIS_OSPI_FLSH
-
 #ifdef XIS_VERSAL_PLAT
+	#define XIS_UPDATE_A_B_MECHANISM
+	#define XIS_FWU_UPDATE
+	//#define XIS_QSPI_FLSH
+	#define XIS_OSPI_FLSH
     #define XIS_MDATA_OFFSET            0x1500000U
     #define XIS_MDATA_BKP_OFFSET        0x1520000U
     #define XIS_BANK_0_OFFSET           0x1580000U
     #define XIS_BANK_1_OFFSET           0x87C0000U
     #define XIS_RECOVERY_OFFSET         0xE0000U
 #else
+	//#define XIS_UPDATE_A_B_MECHANISM
+	#define XIS_GET_BOARD_PARAMS
+	//#define XIS_FWU_UPDATE
+	//#define XIS_QSPI_FLSH
     //#define XIS_UART_ENABLE
     #define XIS_MDATA_OFFSET            0x100000U
     #define XIS_MDATA_BKP_OFFSET        0x120000U
