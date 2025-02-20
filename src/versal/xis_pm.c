@@ -27,7 +27,11 @@
 /***************************** Include Files *********************************/
 #include "xis_pm.h"
 #include "xpm_api.h"
+#ifndef VERSAL_AIEPG2
 #include "xpm_subsystem.h"
+#else
+#include "xpm_nodeid.h"
+#endif
 #include "xplmi_util.h"
 #include "xplmi.h"
 #include "xplmi_hw.h"

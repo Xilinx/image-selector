@@ -115,8 +115,10 @@ u32 XIs_ValidateBootCnt(void)
 void XIs_ResetBootCnt(void)
 {
 	u32 PerRegVal;
-	PerRegVal = XIs_In32(XIS_PMC_GLOB_PERS_REG);
 
+	XIs_Out32(XIS_PMC_GLOB_PERS_REG, XIS_PMC_REG_MAGIC_NUM);
+
+	PerRegVal = XIs_In32(XIS_PMC_GLOB_PERS_REG);
 	PerRegVal = (PerRegVal & ~(0xFF << XIS_BOOT_CNT_BYT));
 
 	XIs_Out32(XIS_PMC_GLOB_PERS_REG, PerRegVal);
@@ -157,8 +159,6 @@ u32 XIs_SetBootCnt(u32 set_val)
 
 	u32 PerRegVal;
 	u32 BootCnt;
-
-	XIs_Out32(XIS_PMC_GLOB_PERS_REG, XIS_PMC_REG_MAGIC_NUM);
 
 	PerRegVal = XIs_In32(XIS_PMC_GLOB_PERS_REG);
 	PerRegVal = ((PerRegVal & ~(0xFF << XIS_BOOT_CNT_BYT)) | (set_val << XIS_BOOT_CNT_BYT));

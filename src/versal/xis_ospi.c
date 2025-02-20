@@ -233,8 +233,12 @@ static int XIs_OspiPsvConfig(XOspiPsv *OspiPsvInstancePtr, UINTPTR BaseAddress)
 	u8 UniqueValue;
 	XOspiPsv_Config *OspiPsvConfig;
 
+#ifdef VERSAL_AIEPG2
+	Status = XPm_PmcRequestDevice(PM_DEV_OSPI);
+#else
 	Status = XPm_RequestDevice(PM_SUBSYS_PMC, PM_DEV_OSPI,
 		((u32)PM_CAP_ACCESS | (u32)PM_CAP_SECURE), XPM_DEF_QOS, 0U, XPLMI_CMD_SECURE);
+#endif
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}

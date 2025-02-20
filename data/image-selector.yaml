@@ -16,6 +16,7 @@ description: Image Selector for ZynqMP and Versal devices.
 supported_processors:
   - psv_pmc
   - psu_cortexa53
+  - pmc
 
 supported_os:
   - standalone
@@ -34,4 +35,7 @@ depends_libs:
   xilpm: {}
   xilsecure: {}
   xilpuf: {}
+  xilocp: {}
+  xilcert: {}
+  xilpm_ng: {}
 ...
