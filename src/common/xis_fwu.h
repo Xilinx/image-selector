@@ -63,7 +63,11 @@ extern "C" {
 #define XIS_CRC32_SIZE              0x4
 #define XIS_CRC32_OFFSET            0x0
 #define XIS_DEFAULT_VAL             0x1
+#ifdef VERSAL_AIEPG2
+#define XIS_IHT_OFFSET              0x2D0
+#else
 #define XIS_IHT_OFFSET              0xC4
+#endif
 #define XIS_OPT_DATA_ID             0x22
 #define XIS_ZERO_OFFSET             0x00
 
