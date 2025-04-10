@@ -30,6 +30,7 @@ extern "C" {
 #endif
 /***************************** Include Files *********************************/
 #include "xis_fwu_mdata.h"
+#include <stdbool.h>
 /************************** Constant Definitions *****************************/
 
 /**************************** Type Definitions *******************************/
@@ -68,8 +69,12 @@ extern "C" {
 #else
 #define XIS_IHT_OFFSET              0xC4
 #endif
-#define XIS_OPT_DATA_ID             0x22
+#define XIS_OPT_DATA_ID_1           0x21
+#define XIS_OPT_DATA_ID_2           0x22
 #define XIS_ZERO_OFFSET             0x00
+#define XIS_IMG_REVISON_SIZE        0x80
+#define XIS_STRNG_TERMINATE         0x38
+#define XIS_VER_STRN_START_OFFSET   0x4
 
 
 /************************** Function Prototypes ******************************/
@@ -92,7 +97,7 @@ u32 XIs_IsTrialState(struct fwu_mdata *mdata);
 void XIs_JumpToBootBank(u32 bank_id);
 void XIs_JumpToImgRcry(void);
 u32 XIs_ReadActiveBankData(u32 bank_id, u32 sub_offset);
-u32 XIs_SearchOptionalData(u32 DataId, u32 *rollback_cnt);
+u32 XIs_SearchOptionalData(u32 DataId, u32 *rollback_cnt, bool flag);
 
 #ifdef __cplusplus
 }
