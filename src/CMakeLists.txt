@@ -21,8 +21,8 @@ if(("${CMAKE_MACHINE}" STREQUAL "Versal") OR
   collect(PROJECT_LIB_DEPS xilffs)
   collect(PROJECT_LIB_DEPS xilsecure)
   collect(PROJECT_LIB_DEPS xilsecure_plat)
-if("${CMAKE_SUBMACHINE}" STREQUAL "VersalGen2")
-  # Use xilpm_ng for VersalGen2
+if("${CMAKE_SUBMACHINE}" STREQUAL "Versal_2VE_2VM")
+  # Use xilpm_ng for Versal_2VE_2VM
   collect(PROJECT_LIB_DEPS xilpm_ng)
 else()
   collect(PROJECT_LIB_DEPS xilpm)
