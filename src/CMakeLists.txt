@@ -20,7 +20,6 @@ if(("${CMAKE_MACHINE}" STREQUAL "Versal") OR
     ("${CMAKE_MACHINE}" STREQUAL "VersalNet"))
   collect(PROJECT_LIB_DEPS xilffs)
   collect(PROJECT_LIB_DEPS xilsecure)
-  collect(PROJECT_LIB_DEPS xilsecure_plat)
 if("${CMAKE_SUBMACHINE}" STREQUAL "Versal_2VE_2VM")
   # Use xilpm_ng for Versal_2VE_2VM
   collect(PROJECT_LIB_DEPS xilpm_ng)
