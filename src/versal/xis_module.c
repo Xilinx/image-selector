@@ -31,7 +31,9 @@
 #include "xplmi.h"
 #include "xis_loader.h"
 #include "xis_pm.h"
-
+#ifdef VERSAL_2VE_2VM
+#include "xsecure_init.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -78,6 +80,13 @@ int XPlm_ModuleInit(void)
 	if (Status != XST_SUCCESS) {
 		goto END;
 	}
+
+#ifdef VERSAL_2VE_2VM
+	Status = XSecure_AesShaInit();
+	if (Status != XST_SUCCESS) {
+		goto END;
+	}
+#endif
 
 END:
 	return Status;
