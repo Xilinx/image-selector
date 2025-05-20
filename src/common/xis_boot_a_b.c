@@ -140,7 +140,7 @@ END:
  ******************************************************************************/
 void XIs_UpdateBootPart(u32 bank_id, u8 trial)
 {
-	if(trial != XIS_TRUE){
+	if(trial == XIS_TRUE){
 		XIs_Printf(XIS_DEBUG_GENERAL, "Updated bank %d to boot part"
 					" register\r\n", bank_id);
 		XIs_UpdateBootPartReg(bank_id);
