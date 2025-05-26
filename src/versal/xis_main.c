@@ -94,7 +94,6 @@ int main(void)
 		goto END;
 	}
 
-	sleep(1);
 	XIs_Printf(XIS_DEBUG_PRINT_ALWAYS, "ImageSelector Version: %x.%x\r\n"
 					,XIS_IMAGESEL_MAJOR_VER, XIS_IMAGESEL_MINOR_VER );
 
@@ -134,7 +133,6 @@ int main(void)
 #endif
 #endif
 
-	sleep(1);
 	XIs_Softreset();
 
 	while(1U) {
