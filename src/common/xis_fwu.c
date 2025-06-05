@@ -587,6 +587,7 @@ void XIs_JumpToBootBank(u32 bank_id)
 		XIs_Printf(XIS_DEBUG_GENERAL, "Multiboot boot_offset: 0x%x\r\n",boot_offset);
 		XIs_UpdateMultiBootValue(boot_offset);
 	}
+	XIs_Printf(XIS_DEBUG_GENERAL, "\r\n");
 }
 
 /*****************************************************************************/
@@ -604,4 +605,5 @@ void XIs_JumpToImgRcry(void)
 	boot_offset = (XIS_RECOVERY_OFFSET/ XIS_SIZE_32KB);
 	XIs_Printf(XIS_DEBUG_GENERAL, "Multiboot boot_offset: 0x%x\r\n",boot_offset);
 	XIs_UpdateMultiBootValue(boot_offset);
+	XIs_Printf(XIS_DEBUG_GENERAL, "\r\n");
 }

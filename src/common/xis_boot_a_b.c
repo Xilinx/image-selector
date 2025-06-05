@@ -190,21 +190,23 @@ void XIs_PrintMdata(void)
 
 	for (i = 0; i < Mdata.fw_desc.num_images; i++) {
 		img_entry = &Mdata.fw_desc.img_entry[i];
-		XIs_Printf(XIS_DEBUG_GENERAL, "\nImage Type Guid: ");
+		XIs_Printf(XIS_DEBUG_GENERAL, "Image Type Guid: ");
 		XIs_PrintGuid(img_entry->image_type_guid);
-		XIs_Printf(XIS_DEBUG_GENERAL, "\nLocation Guid: ");
+		XIs_Printf(XIS_DEBUG_GENERAL, "\r\n");
+		XIs_Printf(XIS_DEBUG_GENERAL, "Location Guid: ");
 		XIs_PrintGuid(img_entry->location_guid);
+		XIs_Printf(XIS_DEBUG_GENERAL, "\r\n");
 		for (j = 0; j < Mdata.fw_desc.num_banks; j++) {
 			img_info = &img_entry->img_bank_info[j];
-			XIs_Printf(XIS_DEBUG_GENERAL, "\nImage Guid: ");
+			XIs_Printf(XIS_DEBUG_GENERAL, "Image Guid: ");
 			XIs_PrintGuid(img_info->image_guid);
-			XIs_Printf(XIS_DEBUG_GENERAL, "\nImage Acceptance: %s",
-				   img_info->accepted == 0x1 ? "yes" : "no");
+			XIs_Printf(XIS_DEBUG_GENERAL, "\r\n");
+			XIs_Printf(XIS_DEBUG_GENERAL, "Image Acceptance: %s",
+					img_info->accepted == 0x1 ? "yes" : "no");
+			XIs_Printf(XIS_DEBUG_GENERAL, "\r\n");
 		}
 		XIs_Printf(XIS_DEBUG_GENERAL, "\r\n");
 	}
-
-	XIs_Printf(XIS_DEBUG_GENERAL, "\r\n");
 }
 
 /*****************************************************************************/
