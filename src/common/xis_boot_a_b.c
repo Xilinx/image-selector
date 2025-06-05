@@ -51,7 +51,6 @@ struct fwu_mdata Mdata;
 u32 XIs_BootABImageBank(void)
 {
 	u32 Status = XST_FAILURE;
-	u8 is_trial = XIS_FALSE;
 	u32 rollback_count;
 
 	XIs_InitBootCnt();
@@ -64,7 +63,7 @@ u32 XIs_BootABImageBank(void)
 	}
 
 	XIs_ReadBootCnt();
-	Status = XIs_ReadRollBackCnt(&Mdata, &rollback_count, Mdata.active_index);
+	Status = XIs_ReadRollBackCnt(&rollback_count, Mdata.active_index);
 	if (Status != XST_SUCCESS) {
 		XIs_Printf(XIS_DEBUG_GENERAL, "Read Rollback counter fail"
 			" Launch recovery tool\r\n");
@@ -72,13 +71,14 @@ u32 XIs_BootABImageBank(void)
 	}
 	XIs_Printf(XIS_DEBUG_GENERAL, "Rollback counter: %x\n", rollback_count);
 	XIs_PrintMdata();
+	(void)XIs_PrintVerStrn(Mdata.active_index);
 
 	if(XIs_ReadBankState(&Mdata, Mdata.active_index)
 						 == XIS_FWU_ACCEPTED_BANK_STATE){
 		XIs_Printf(XIS_DEBUG_GENERAL, "Reset the Boot counter as bank"
 					" %d is in accepted state\r\n", Mdata.active_index);
 		XIs_ResetBootCnt();
-		XIs_UpdateBootPart(Mdata.active_index, is_trial);
+		XIs_UpdateBootPart(Mdata.active_index);
 		goto END;
 	}else{
 		XIs_Printf(XIS_DEBUG_GENERAL, "Check for trial state"
@@ -90,12 +90,11 @@ u32 XIs_BootABImageBank(void)
 		}
 		if(XIs_IsTrialState(&Mdata) == XIS_TRUE){
 			XIs_Printf(XIS_DEBUG_GENERAL, "Boot is in trial state\r\n");
-			is_trial = XIS_TRUE;
 			XIs_Printf(XIS_DEBUG_GENERAL, "Check if bank %d is in accepted"
 						" state\r\n", Mdata.previous_active_index);
 			if(XIs_ReadBankState(&Mdata, Mdata.previous_active_index)
 										== XIS_FWU_ACCEPTED_BANK_STATE){
-				XIs_UpdateBootPart(Mdata.active_index, is_trial);
+				XIs_UpdateBootPart(Mdata.active_index);
 				goto END;
 			}else{
 				XIs_Printf(XIS_DEBUG_GENERAL, "Launch recovery tool,"
@@ -110,7 +109,7 @@ u32 XIs_BootABImageBank(void)
 				XIs_Printf(XIS_DEBUG_GENERAL, "Reset the Boot counter as bank"
 							" is not in trial state\r\n");
 				XIs_ResetBootCnt();
-				XIs_UpdateBootPart(Mdata.previous_active_index, is_trial);
+				XIs_UpdateBootPart(Mdata.previous_active_index);
 				goto END;
 			}else{
 				XIs_Printf(XIS_DEBUG_GENERAL, "Launch recovery tool,"
@@ -138,13 +137,12 @@ END:
  * @return	none
  *
  ******************************************************************************/
-void XIs_UpdateBootPart(u32 bank_id, u8 trial)
+void XIs_UpdateBootPart(u32 bank_id)
 {
-	if(trial == XIS_TRUE){
-		XIs_Printf(XIS_DEBUG_GENERAL, "Updated bank %d to boot part"
+	XIs_Printf(XIS_DEBUG_GENERAL, "Updated bank %d to boot part"
 					" register\r\n", bank_id);
-		XIs_UpdateBootPartReg(bank_id);
-	}
+	XIs_UpdateBootPartReg(bank_id);
+
 	XIs_Printf(XIS_DEBUG_GENERAL, "Updated multiboot value to bank"
 				" %d\r\n", bank_id);
 	XIs_JumpToBootBank(bank_id);

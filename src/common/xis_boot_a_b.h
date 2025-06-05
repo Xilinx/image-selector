@@ -40,7 +40,7 @@ extern "C" {
 
 u32 XIs_BootABImageBank(void);
 void XIs_PrintMdata(void);
-void XIs_UpdateBootPart(u32 bank_id, u8 trial);
+void XIs_UpdateBootPart(u32 bank_id);
 
 #ifdef __cplusplus
 }

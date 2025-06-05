@@ -73,7 +73,7 @@ extern "C" {
 #define XIS_OPT_DATA_ID_2           0x22
 #define XIS_ZERO_OFFSET             0x00
 #define XIS_IMG_REVISON_SIZE        0x80
-#define XIS_STRNG_TERMINATE         0x38
+#define XIS_STRNG_TERMINATE         0x44
 #define XIS_VER_STRN_START_OFFSET   0x4
 
 
@@ -90,14 +90,15 @@ u32 XIs_ValidateBootCnt(void);
 u32 XIs_ReadMetaData(struct fwu_mdata *mdata);
 u32 XIs_ValidateMetaData(struct fwu_mdata *mdata, u8 *data_buff);
 u32 XIs_ReadBankState(struct fwu_mdata *mdata, u32 bank_id);
-u32 XIs_ReadRollBackCnt(struct fwu_mdata *mdata, u32 *rollback_cnt, u32 bank_id);
+u32 XIs_ReadRollBackCnt(u32 *rollback_cnt, u32 bank_id);
 void XIs_UpdateBootPartReg(u32 bank_id);
 u32 XIs_UpdateRollbackReg(u32 counter_val);
 u32 XIs_IsTrialState(struct fwu_mdata *mdata);
 void XIs_JumpToBootBank(u32 bank_id);
 void XIs_JumpToImgRcry(void);
 u32 XIs_ReadActiveBankData(u32 bank_id, u32 sub_offset);
-u32 XIs_SearchOptionalData(u32 DataId, u32 *rollback_cnt, bool flag);
+u32 XIs_SearchOptionalData(u32 DataId, u32 *data_off);
+u32 XIs_PrintVerStrn(u32 bank_id);
 
 #ifdef __cplusplus
 }

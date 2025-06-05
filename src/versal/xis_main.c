@@ -53,7 +53,7 @@
 /**************************** Type Definitions *******************************/
 
 /***************** Macros (Inline Functions) Definitions *********************/
-#define XIS_IMAGESEL_MAJOR_VER 0x1
+#define XIS_IMAGESEL_MAJOR_VER 0x2
 #define XIS_IMAGESEL_MINOR_VER 0x0
 /************************** Function Prototypes ******************************/
 static int XPlm_Init(void);

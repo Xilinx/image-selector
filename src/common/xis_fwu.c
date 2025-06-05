@@ -78,7 +78,7 @@ void XIs_ReadBootCnt(void)
 	u32 BootCnt;
 
 	BootCnt = (XIs_In32(XIS_PMC_GLOB_PERS_REG) >> XIS_BOOT_CNT_BYT) & 0xFF;
-	if(BootCnt > MaxBootCnt) {
+	if(BootCnt >= MaxBootCnt) {
 		BootCnt = XIs_SetBootCnt(XIS_DEFAULT_VAL);
 	}
 	XIs_Printf(XIS_DEBUG_GENERAL, "Boot Count: %x\r\n", BootCnt);
@@ -289,18 +289,19 @@ u32 XIs_ReadBankState(struct fwu_mdata *mdata, u32 bank_id)
 /**
  * This function reads rollback counter value for each bank
  *
- * @param	mdata
+ * @param	rollback_cnt
  *
  * @param	bank_id
  *
  * @return	XST_SUCCESS or XST_FAILURE
  *
  ******************************************************************************/
-u32 XIs_ReadRollBackCnt(struct fwu_mdata *mdata, u32 *rollback_cnt, u32 bank_id)
+u32 XIs_ReadRollBackCnt(u32 *rollback_cnt, u32 bank_id)
 {
 	u32 Status = XST_FAILURE;
 #ifdef XIS_VERSAL_PLAT
-	u32 OptOff;
+	u32 opt_data_off;
+	u32 opt_data_id_off;
 #endif
 
 	Status = XIs_ReadActiveBankData(bank_id, XIS_ZERO_OFFSET);
@@ -310,30 +311,69 @@ u32 XIs_ReadRollBackCnt(struct fwu_mdata *mdata, u32 *rollback_cnt, u32 bank_id)
 	}
 
 #ifdef XIS_VERSAL_PLAT
-	OptOff = *(u32 *)&ReadBuff[XIS_IHT_OFFSET] + XIH_IHT_LEN;
-	Status = XIs_ReadActiveBankData(bank_id, OptOff);
+	opt_data_off = *(u32 *)&ReadBuff[XIS_IHT_OFFSET] + XIH_IHT_LEN;
+	Status = XIs_ReadActiveBankData(bank_id, opt_data_off);
 	if (Status != XST_SUCCESS) {
 		XIs_Printf(XIS_DEBUG_GENERAL, "Read Active bank optional data failed\r\n");
 		return Status;
 	}
-	Status = XIs_SearchOptionalData(XIS_OPT_DATA_ID_2, rollback_cnt, true);
+	Status = XIs_SearchOptionalData(XIS_OPT_DATA_ID_2, &opt_data_id_off);
 	if (Status != XST_SUCCESS) {
 		XIs_Printf(XIS_DEBUG_GENERAL, "Optional Data Id not found\r\n");
 		return Status;
 	}
 
-	Status = XIs_SearchOptionalData(XIS_OPT_DATA_ID_1, NULL, false);
-	if (Status != XST_SUCCESS) {
-		XIs_Printf(XIS_DEBUG_GENERAL, "Optional Data Id not found\r\n");
-		return Status;
-	}
-
+	*rollback_cnt = *(u32 *)&ReadBuff[opt_data_id_off+XIS_VER_STRN_START_OFFSET];
 
 #else
 	*rollback_cnt = *(u32 *)&ReadBuff[XIS_ROLLBACK_CNT_OFFSET];
 #endif
 
 	return Status;
+}
+
+/*****************************************************************************/
+/**
+ * This function reads and prints version string of active bank
+ *
+ * @param	bank_id
+ *
+ * @return	XST_SUCCESS or XST_FAILURE
+ *
+ ******************************************************************************/
+u32 XIs_PrintVerStrn(u32 bank_id)
+{
+#ifdef XIS_VERSAL_PLAT
+	u32 Status = XST_FAILURE;
+	u32 opt_data_off;
+	u32 opt_data_id_off;
+	u8 VerStrn[XIS_IMG_REVISON_SIZE];
+
+	Status = XIs_ReadActiveBankData(bank_id, XIS_ZERO_OFFSET);
+	if (Status != XST_SUCCESS) {
+		XIs_Printf(XIS_DEBUG_GENERAL, "Read Active bank data failed\r\n");
+		return Status;
+	}
+
+	opt_data_off = *(u32 *)&ReadBuff[XIS_IHT_OFFSET] + XIH_IHT_LEN;
+	Status = XIs_ReadActiveBankData(bank_id, opt_data_off);
+	if (Status != XST_SUCCESS) {
+		XIs_Printf(XIS_DEBUG_GENERAL, "Read Active bank optional data failed\r\n");
+		return Status;
+	}
+	Status = XIs_SearchOptionalData(XIS_OPT_DATA_ID_1, &opt_data_id_off);
+	if (Status != XST_SUCCESS) {
+		XIs_Printf(XIS_DEBUG_GENERAL, "Optional Data Id not found\r\n");
+		return Status;
+	}
+
+	strncpy((char *)VerStrn, (char *)&ReadBuff[opt_data_id_off+XIS_VER_STRN_START_OFFSET],
+		XIS_IMG_REVISON_SIZE);
+	VerStrn[XIS_STRNG_TERMINATE] = '\0';
+	XIs_Printf(XIS_DEBUG_PRINT_ALWAYS, "Active bank image version: %s\r\n", VerStrn);
+
+	return Status;
+#endif
 }
 
 /*****************************************************************************/
@@ -403,11 +443,10 @@ u32 XIs_ReadActiveBankData(u32 bank_id, u32 sub_offset)
  * @return	Data
  *
  ******************************************************************************/
-u32 XIs_SearchOptionalData(u32 DataId, u32 *rollback_cnt, bool flag)
+u32 XIs_SearchOptionalData(u32 DataId, u32 *data_off)
 {
 	u32 Offset = 0;
 	u32 Data;
-	u8 VerStrn[XIS_IMG_REVISON_SIZE];
 
 	while(Offset < XIS_SIZE_1KB){
 		Data = *(u32 *)&ReadBuff[Offset];
@@ -416,18 +455,9 @@ u32 XIs_SearchOptionalData(u32 DataId, u32 *rollback_cnt, bool flag)
 			Offset += ((Data & XIH_OPT_DATA_HDR_LEN_MASK) >>
 				XIH_OPT_DATA_LEN_SHIFT) << XILPDI_WORD_LEN_SHIFT;
 		} else {
-			if(flag == true){
-				*rollback_cnt = *(u32 *)&ReadBuff[Offset+XIS_VER_STRN_START_OFFSET];
+				*data_off = Offset;
 				return XST_SUCCESS;
 				break;
-			}else{
-				strncpy((char *)VerStrn, (char *)&ReadBuff[Offset+XIS_VER_STRN_START_OFFSET],
-					XIS_IMG_REVISON_SIZE);
-				VerStrn[XIS_STRNG_TERMINATE] = '\0';
-				XIs_Printf(XIS_DEBUG_PRINT_ALWAYS, "Active bank image version: %s\r\n", VerStrn);
-				return XST_SUCCESS;
-				break;
-			}
 		}
 	}
 
@@ -502,12 +532,12 @@ u32 XIs_IsTrialState(struct fwu_mdata *mdata)
 
 	if((XIs_In32(XIS_PMC_GLOB_PERS_REG)>>XIS_MAGIC_VAL_BYT) == (XIS_PMC_REG_MAGIC_NUM>>XIS_MAGIC_VAL_BYT)) {
 		if(((XIs_In32(XIS_PMC_GLOB_PERS_REG) >> XIS_BOOT_PART_BYT) & 0xFF) != mdata->active_index) {
-			Status = XIs_ReadRollBackCnt(mdata, &rollback_old, mdata->previous_active_index);
+			Status = XIs_ReadRollBackCnt(&rollback_old, mdata->previous_active_index);
 			if (Status != XST_SUCCESS) {
 				XIs_Printf(XIS_DEBUG_GENERAL, "Rollback counter old read failed\r\n");
 				return Status;
 			}
-			XIs_ReadRollBackCnt(mdata, &rollback_new, mdata->active_index);
+			Status = XIs_ReadRollBackCnt(&rollback_new, mdata->active_index);
 			if (Status != XST_SUCCESS) {
 				XIs_Printf(XIS_DEBUG_GENERAL, "Rollback counter new read failed\r\n");
 				return Status;
@@ -525,9 +555,8 @@ u32 XIs_IsTrialState(struct fwu_mdata *mdata)
 				return XIS_FALSE;
 			}
 		} else {
-			XIs_Printf(XIS_DEBUG_GENERAL, "Boot Partition is equal to active bank"
-					" image, hence trial state failed\r\n");
-			return XIS_FALSE;
+			/* Boot is already in trial states, hence return true */
+			return XIS_TRUE;
 		}
 	} else {
 		XIs_Printf(XIS_DEBUG_GENERAL, "Magic number doesn't exist,"
