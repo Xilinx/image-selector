@@ -78,7 +78,13 @@ extern "C" {
 #define XIS_MDATA_OFFSET             0x1500000U
 #define XIS_MDATA_BKP_OFFSET         0x1520000U
 #define XIS_BANK_0_OFFSET            0x1580000U
+#ifdef XIS_512G_FLASH
+#define XIS_BANK_1_OFFSET            0x25C0000U
+#elif XIS_1G_FLASH
+#define XIS_BANK_1_OFFSET            0x47C0000U
+#else
 #define XIS_BANK_1_OFFSET            0x87C0000U
+#endif
 #define XIS_RECOVERY_OFFSET          0xE0000U
 #else
 #define XIS_MDATA_OFFSET             0x100000U
