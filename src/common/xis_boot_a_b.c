@@ -69,7 +69,7 @@ u32 XIs_BootABImageBank(void)
 			" Launch recovery tool\r\n");
 		goto RCRY;
 	}
-	XIs_Printf(XIS_DEBUG_GENERAL, "Rollback counter: %x\n", rollback_count);
+	XIs_Printf(XIS_DEBUG_GENERAL, "Rollback counter: %x\r\n", rollback_count);
 	XIs_PrintMdata();
 	(void)XIs_PrintVerStrn(Mdata.active_index);
 
