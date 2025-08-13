@@ -116,7 +116,7 @@ int main(void)
 	}
 	GpioStatus = GetGpioStatus();
 	if(GpioStatus == 0U) {
-		OffsetVal = (u32)(XIS_RECOVERY_ADDRESS / XIS_SIZE_32KB);
+		OffsetVal = (u32)(XIS_RECOVERY_OFFSET / XIS_SIZE_32KB);
 		XIs_UpdateMultiBootValue(OffsetVal);
 		goto END;
 	}

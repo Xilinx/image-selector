@@ -52,7 +52,6 @@ typedef struct board
 #define XIS_PAGE_SIZE					(0x10U)
 #define XIS_BOARDNAME_OFFSET			(0x0U)
 #define XIS_XLNX_OFFSET					(0x24U)
-#define XIS_RECOVERY_ADDRESS			(0x01E00000U)
 /* Board Parameters will present at 0xD0 Address location
  * for ZCU102,104,106,111 boards
  */
