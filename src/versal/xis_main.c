@@ -36,16 +36,19 @@
 #include "xis_plat.h"
 
 #ifdef XIS_UPDATE_A_B_MECHANISM
-	#ifdef XIS_FWU_UPDATE
-		#include "xis_boot_a_b.h"
-	#else
-		#include "xis_update_a_b.h"
-	#endif
-	#ifdef XIS_QSPI_FLSH
-		#include "xis_qspi.h"
-	#elif defined XIS_OSPI_FLSH
-		#include "xis_ospi.h"
-	#endif
+#ifdef XIS_FWU_UPDATE
+#include "xis_boot_a_b.h"
+#else
+#include "xis_update_a_b.h"
+#endif
+#ifdef XIS_QSPI_FLSH
+#include "xis_qspi.h"
+#elif defined XIS_OSPI_FLSH
+#include "xis_ospi.h"
+#endif
+#if defined(XPAR_XGPIOPS_NUM_INSTANCES)
+#include "xis_gpio.h"
+#endif
 #endif
 
 /************************** Constant Definitions *****************************/
@@ -71,6 +74,11 @@ static int XPlm_Init(void);
 int main(void)
 {
 	int Status = XST_FAILURE;
+	u32 MultiBootVal;
+#if defined(XIS_UPDATE_A_B_MECHANISM) && defined(XPAR_XGPIOPS_NUM_INSTANCES)
+	u32 GpioStatus;
+	u32 OffsetVal;
+#endif
 
 	Status = XPlm_Init();
 	if (Status != XST_SUCCESS)
@@ -100,6 +108,8 @@ int main(void)
 #if defined (XIS_GET_BOARD_PARAMS)
 	Status = XIs_ImageSelBoardParam();
 	if (Status != XST_SUCCESS) {
+		XIs_Printf(XIS_DEBUG_GENERAL, "Single Image Multiboot"
+			"value update failed\r\n");
 		goto END;
 	}
 #elif defined(XIS_UPDATE_A_B_MECHANISM)
@@ -113,6 +123,20 @@ int main(void)
 	Status = XIs_OspiInit();
 	if (Status != XST_SUCCESS) {
 		XIs_Printf(XIS_DEBUG_GENERAL, "OSPI Init failed\r\n");
+		goto END;
+	}
+#endif
+#if defined(XPAR_XGPIOPS_NUM_INSTANCES)
+	Status = GpioInit();
+	if(Status != XST_SUCCESS) {
+		XIs_Printf(XIS_DEBUG_PRINT_ALWAYS, "Gpio Init Failed\r\n");
+	}
+	GpioStatus = GetGpioStatus();
+	if(GpioStatus == 0U) {
+		OffsetVal = (u32)(XIS_RECOVERY_OFFSET / XIS_SIZE_32KB);
+		XIs_UpdateMultiBootValue(OffsetVal);
+		XIs_Printf(XIS_DEBUG_PRINT_ALWAYS, "FW Update button pressed:,"
+			"Launching Image Recovery\r\n");
 		goto END;
 	}
 #endif
@@ -131,7 +155,16 @@ int main(void)
 		goto END;
 	}
 #endif
+#else
+	MultiBootVal = XIs_In32(PMC_GLOBAL_PMC_MULTI_BOOT);
+	(void)XIs_UpdateMultiBootValue(MultiBootVal + 1U);
 #endif
+
+END:
+	if (Status != XST_SUCCESS) {
+		MultiBootVal = XIs_In32(PMC_GLOBAL_PMC_MULTI_BOOT);
+		(void)XIs_UpdateMultiBootValue(MultiBootVal + 1U);
+	}
 
 	XIs_Softreset();
 
@@ -139,7 +172,6 @@ int main(void)
 		;
 	}
 
-END:
 	/* Control should never reach here */
 	return Status;
 }

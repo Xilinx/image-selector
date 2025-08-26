@@ -40,7 +40,12 @@ extern "C" {
 /**************************** Type Definitions *******************************/
 
 /***************** Macros (Inline Functions) Definitions *********************/
+
+#ifdef XIS_VERSAL_PLAT
+#define FW_UPDATE_BUTTON	(26U)
+#else
 #define FW_UPDATE_BUTTON	(12U)
+#endif
 
 /************************** Function Prototypes ******************************/
 int GpioInit(void);

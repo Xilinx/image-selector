@@ -37,11 +37,16 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
-#ifndef SDT
-#define XIS_GPIO_DEVICE		XPAR_XGPIOPS_0_DEVICE_ID
+#ifdef XIS_VERSAL_PLAT
+#if XPAR_XGPIOPS_NUM_INSTANCES >= 2
+#define XIS_GPIO_DEVICE		XPAR_XGPIOPS_1_BASEADDR
 #else
 #define XIS_GPIO_DEVICE		XPAR_XGPIOPS_0_BASEADDR
 #endif
+#else
+#define XIS_GPIO_DEVICE		XPAR_XGPIOPS_0_BASEADDR
+#endif
+
 
 /**************************** Type Definitions *******************************/
 
@@ -73,6 +78,10 @@ int GpioInit(void)
 		Status = XIS_GPIO_LKP_CONFIG_ERROR;
 		goto END;
 	}
+
+#ifdef XIS_VERSAL_PLAT
+	Gpio.PmcGpio = 0x1U;
+#endif
 
 	Status = XGpioPs_CfgInitialize(&Gpio, ConfigPtr,
 					ConfigPtr->BaseAddr);

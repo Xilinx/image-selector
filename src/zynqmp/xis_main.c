@@ -100,7 +100,7 @@ int main(void)
 	Status = XIs_ImageSelBoardParam();
 	if (Status != XST_SUCCESS) {
 		XIs_Printf(XIS_DEBUG_GENERAL, "Single Image Multiboot"
-							"value update failed\r\n");
+			"value update failed\r\n");
 		goto END;
 	}
 #elif defined(XIS_UPDATE_A_B_MECHANISM)
@@ -118,6 +118,8 @@ int main(void)
 	if(GpioStatus == 0U) {
 		OffsetVal = (u32)(XIS_RECOVERY_OFFSET / XIS_SIZE_32KB);
 		XIs_UpdateMultiBootValue(OffsetVal);
+		XIs_Printf(XIS_DEBUG_PRINT_ALWAYS, "FW Update button pressed:,"
+			"Launching Image Recovery\r\n");
 		goto END;
 	}
 #endif
