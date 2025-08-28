@@ -64,8 +64,11 @@ extern "C" {
 #ifdef XIS_VERSAL_PLAT
 #define XIS_UPDATE_A_B_MECHANISM
 #define XIS_FWU_UPDATE
-//#define XIS_QSPI_FLSH
+#ifdef XIS_QSPI_FLSH
+#define XIS_QSPI_FLSH
+#else
 #define XIS_OSPI_FLSH
+#endif
 #else
 #define XIS_UPDATE_A_B_MECHANISM
 //#define XIS_GET_BOARD_PARAMS
