@@ -127,6 +127,26 @@ SECTIONS
    __data_end = .;
 } > tmr_ram_cntlr_Mem
 
+/*******************************************************************************************
+ * @brief xpm_initialized_data Xilpm initialized data section
+ *
+ * This section defines memory layout for initialized data that needs to be
+ * saved and restored during XilPM (Xilinx Power Management) runtime operations.
+ *
+ * @details The init data section contains:
+ * - Runtime variables that maintain state across PLM impactless update
+ * - Configuration parameters that are initialized at boot but may change during runtime
+ * - Critical system state information required for proper power management operation
+ *
+ *******************************************************************************************/
+.xpm_initialized_data : {
+   . = ALIGN(4);
+   __xpm_init_data_start = . ;
+   KEEP(*(.RefTable))
+   . = ALIGN(4);
+   KEEP(*(SORT(.RefTable.*)))
+    __xpm_init_data_end = .;
+} > tmr_ram_cntlr_Mem
 
 .struct_data : {
    . = ALIGN(4);
@@ -260,26 +280,7 @@ _SDA2_BASE_ = __sdata2_start + ((__sbss2_end - __sdata2_start) / 2 );
    KEEP(*(.struct_info_hdr))
    KEEP(*(.struct_versions))
 }
-/*******************************************************************************************
- * @brief xpm_initialized_data Xilpm initialized data section
- *
- * This section defines memory layout for initialized data that needs to be
- * saved and restored during XilPM (Xilinx Power Management) runtime operations.
- *
- * @details The init data section contains:
- * - Runtime variables that maintain state across PLM impactless update
- * - Configuration parameters that are initialized at boot but may change during runtime
- * - Critical system state information required for proper power management operation
- *
- *******************************************************************************************/
-.xpm_initialized_data : {
-   . = ALIGN(4);
-   __xpm_init_data_start = . ;
-   KEEP(*(.RefTable))
-   . = ALIGN(4);
-   KEEP(*(SORT(.RefTable.*)))
-    __xpm_init_data_end = .;
-} > tmr_ram_cntlr_Mem
+
 
 /******************************************************************************************
  * @brief xpm_bss_data XilPm Uninitialized Data Section
