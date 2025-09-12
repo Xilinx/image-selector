@@ -1,6 +1,6 @@
 /******************************************************************************
 * Copyright (c) 2022 Xilinx, Inc. All rights reserved.
-* Copyright (c) 2022-2023, Advanced Micro Devices, Inc. All Rights Reserved.
+* Copyright (c) 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 * SPDX-License-Identifier: MIT
 ******************************************************************************/
 
@@ -17,6 +17,7 @@
 * Ver   Who  Date     Changes
 * ----- ---- -------- -------------------------------------------------------
 * 1.00  skd  01/13/23 Initial release
+* 2.00  aa   09/12/25 Add build time option to disable firmware update feature
 *
 * </pre>
 *
@@ -126,6 +127,8 @@ int main(void)
 		goto END;
 	}
 #endif
+
+#ifndef XIS_DISABLE_PB
 #if defined(XPAR_XGPIOPS_NUM_INSTANCES)
 	Status = GpioInit();
 	if(Status != XST_SUCCESS) {
@@ -140,6 +143,8 @@ int main(void)
 		goto END;
 	}
 #endif
+#endif
+
 #ifdef XIS_FWU_UPDATE
 	Status = XIs_BootABImageBank();
 	if (Status != XST_SUCCESS) {

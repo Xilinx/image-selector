@@ -1,6 +1,6 @@
 /******************************************************************************
 * Copyright (c) 2020-2022 Xilinx, Inc. All rights reserved.
-* Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+* Copyright (c) 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 * SPDX-License-Identifier: MIT
 ******************************************************************************/
 
@@ -22,6 +22,7 @@
 * ----- ---- -------- ---------------------------------------------------------
 * 1.00  Ana  18/06/20 First release
 * 2.00  sd   05/17/24 Added SDT support
+* 3.00  aa   09/12/25 Added support to request QSPI device
 *
 * </pre>
 *
@@ -29,6 +30,9 @@
 
 /***************************** Include Files *********************************/
 #include "xis_qspi.h"
+#include "xpm_defs.h"
+#include "xpm_nodeid.h"
+#include "xplmi.h"
 
 #ifdef XIS_UPDATE_A_B_MECHANISM
 #ifdef XIS_QSPI_FLSH
@@ -523,6 +527,7 @@ int XIs_QspiInit(void)
 	int Status = XST_FAILURE;
 	XQspiPsu_Config *QspiConfig;
 	u32 QspiMode;
+	u32 CapSecureAccess = (u32)PM_CAP_ACCESS | (u32)PM_CAP_SECURE;
 
 	/**
 	 * Initialize the QSPI driver so that it's ready to use
@@ -533,6 +538,8 @@ int XIs_QspiInit(void)
 		XIs_Printf(XIS_DEBUG_GENERAL, "XIS_QSPI_CONFIG_ERROR\r\n");
 		goto END;
 	}
+
+    Status = XPm_RequestDevice(PM_SUBSYS_PMC, PM_DEV_QSPI, CapSecureAccess, XPM_DEF_QOS, 0U, XPLMI_CMD_SECURE);
 
 	Status = XQspiPsu_CfgInitialize(&QspiPsuInstance, QspiConfig,
 			QspiConfig->BaseAddress);
