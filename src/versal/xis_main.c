@@ -18,6 +18,7 @@
 * ----- ---- -------- -------------------------------------------------------
 * 1.00  skd  01/13/23 Initial release
 * 2.00  aa   09/12/25 Add build time option to disable firmware update feature
+* 2.01  sd   10/04/25 Disable firmware update push button by default
 *
 * </pre>
 *
@@ -128,7 +129,7 @@ int main(void)
 	}
 #endif
 
-#ifndef XIS_DISABLE_PB
+#ifdef XIS_ENABLE_PB
 #if defined(XPAR_XGPIOPS_NUM_INSTANCES)
 	Status = GpioInit();
 	if(Status != XST_SUCCESS) {
