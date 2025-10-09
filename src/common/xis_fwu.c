@@ -1,5 +1,5 @@
 /******************************************************************************
-* Copyright (c) 2024 Advanced Micro Devices, Inc. All Rights Reserved.
+* Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All Rights Reserved.
 * SPDX-License-Identifier: MIT
 ******************************************************************************/
 
@@ -370,7 +370,7 @@ u32 XIs_PrintVerStrn(u32 bank_id)
 	strncpy((char *)VerStrn, (char *)&ReadBuff[opt_data_id_off+XIS_VER_STRN_START_OFFSET],
 		XIS_IMG_REVISON_SIZE);
 	VerStrn[XIS_STRNG_TERMINATE] = '\0';
-	XIs_Printf(XIS_DEBUG_PRINT_ALWAYS, "Active bank image version: %s\r\n", VerStrn);
+	XIs_Printf(XIS_DEBUG_PRINT_ALWAYS, "Active bank image ver : %s\r\n", VerStrn);
 
 	return Status;
 #endif

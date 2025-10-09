@@ -1,5 +1,5 @@
 /******************************************************************************
-* Copyright (c) 2024 Advanced Micro Devices, Inc. All Rights Reserved.
+* Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All Rights Reserved.
 * SPDX-License-Identifier: MIT
 ******************************************************************************/
 
@@ -17,6 +17,7 @@
 * Ver   Who  Date     Changes
 * ----- ---- -------- ---------------------------------------------------------
 * 1.00  sd   09/05/24 First release
+* 1.01  aa   10/09/25 Added Version info macros
 *
 * </pre>
 *
@@ -35,6 +36,8 @@ extern "C" {
 /**************************** Type Definitions *******************************/
 
 /***************** Macros (Inline Functions) Definitions *********************/
+#define XIS_IMAGESEL_MAJOR_VER 0x1
+#define XIS_IMAGESEL_MINOR_VER 0x0
 
 /************************** Function Prototypes ******************************/
 

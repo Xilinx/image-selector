@@ -1,6 +1,6 @@
 /******************************************************************************
 * Copyright (c) 2022 Xilinx, Inc. All rights reserved.
-* Copyright (c) 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+* Copyright (c) 2022 - 2025 Advanced Micro Devices, Inc. All Rights Reserved.
 * SPDX-License-Identifier: MIT
 ******************************************************************************/
 
@@ -19,6 +19,7 @@
 * 1.00  skd  01/13/23 Initial release
 * 2.00  aa   09/12/25 Add build time option to disable firmware update feature
 * 2.01  sd   10/04/25 Disable firmware update push button by default
+* 2.02  aa   10/09/25 Removed version info macros
 *
 * </pre>
 *
@@ -58,8 +59,6 @@
 /**************************** Type Definitions *******************************/
 
 /***************** Macros (Inline Functions) Definitions *********************/
-#define XIS_IMAGESEL_MAJOR_VER 0x2
-#define XIS_IMAGESEL_MINOR_VER 0x0
 /************************** Function Prototypes ******************************/
 static int XPlm_Init(void);
 
@@ -104,8 +103,9 @@ int main(void)
 		goto END;
 	}
 
-	XIs_Printf(XIS_DEBUG_PRINT_ALWAYS, "ImageSelector Version: %x.%x\r\n"
-					,XIS_IMAGESEL_MAJOR_VER, XIS_IMAGESEL_MINOR_VER );
+	XIs_Printf(XIS_DEBUG_GENERAL,"**********************************************\r\n");
+	XIs_Printf(XIS_DEBUG_GENERAL,"         Image Selector App Start         \r\n");
+	XIs_Printf(XIS_DEBUG_GENERAL,"**********************************************\r\n");
 
 #if defined (XIS_GET_BOARD_PARAMS)
 	Status = XIs_ImageSelBoardParam();

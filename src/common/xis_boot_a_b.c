@@ -1,5 +1,5 @@
 /******************************************************************************
-* Copyright (c) 2024 Advanced Micro Devices, Inc. All Rights Reserved.
+* Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All Rights Reserved.
 * SPDX-License-Identifier: MIT
 ******************************************************************************/
 
@@ -17,6 +17,7 @@
 * Ver   Who  Date     Changes
 * ----- ---- -------- ---------------------------------------------------------
 * 1.00  sd   05/09/24 First release
+* 2.00  aa   10/09/25 Added prints for better readability
 *
 * </pre>
 *
@@ -33,7 +34,6 @@
 /**************************** Type Definitions *******************************/
 
 /***************** Macros (Inline Functions) Definitions *********************/
-
 /************************** Function Prototypes ******************************/
 static void XIs_PrintGuid(efi_guid_t guid);
 /************************** Variable Definitions *****************************/
@@ -61,7 +61,7 @@ u32 XIs_BootABImageBank(void)
 			" Launch recovery tool\r\n");
 		goto RCRY;
 	}
-
+	XIs_Printf(XIS_DEBUG_GENERAL,"******** Boot info ********\r\n");
 	XIs_ReadBootCnt();
 	Status = XIs_ReadRollBackCnt(&rollback_count, Mdata.active_index);
 	if (Status != XST_SUCCESS) {
@@ -71,8 +71,12 @@ u32 XIs_BootABImageBank(void)
 	}
 	XIs_Printf(XIS_DEBUG_GENERAL, "Rollback counter: %x\r\n", rollback_count);
 	XIs_PrintMdata();
+	XIs_Printf(XIS_DEBUG_GENERAL,"******** Version info ********\r\n");
+	XIs_Printf(XIS_DEBUG_PRINT_ALWAYS, "Image Selector Version: %x.%x\r\n",
+			XIS_IMAGESEL_MAJOR_VER, XIS_IMAGESEL_MINOR_VER );
 	(void)XIs_PrintVerStrn(Mdata.active_index);
 
+	XIs_Printf(XIS_DEBUG_GENERAL,"\r\n******** Image Selection info ********\r\n");
 	if(XIs_ReadBankState(&Mdata, Mdata.active_index)
 						 == XIS_FWU_ACCEPTED_BANK_STATE){
 		XIs_Printf(XIS_DEBUG_GENERAL, "Reset the Boot counter as bank"
@@ -160,7 +164,7 @@ void XIs_PrintMdata(void)
 	u32 i, j;
 	struct fwu_image_entry *img_entry;
 	struct fwu_image_bank_info *img_info;
-
+	XIs_Printf(XIS_DEBUG_GENERAL,"******** Metadata info ********\r\n");
 	XIs_Printf(XIS_DEBUG_GENERAL, "Mdata.crc32: %x\r\n", Mdata.crc32);
 	XIs_Printf(XIS_DEBUG_GENERAL, "Mdata.version: %x\r\n", Mdata.version);
 	XIs_Printf(XIS_DEBUG_GENERAL, "Mdata.active_index: %x\r\n",
@@ -187,7 +191,7 @@ void XIs_PrintMdata(void)
 								Mdata.fw_desc.img_entry_size);
 	XIs_Printf(XIS_DEBUG_GENERAL, "Mdata.fw_desc.bank_info_entry_size: %x\r\n",
 								Mdata.fw_desc.bank_info_entry_size);
-
+	XIs_Printf(XIS_DEBUG_GENERAL,"******** Guid info ********\r\n");
 	for (i = 0; i < Mdata.fw_desc.num_images; i++) {
 		img_entry = &Mdata.fw_desc.img_entry[i];
 		XIs_Printf(XIS_DEBUG_GENERAL, "Image Type Guid: ");
