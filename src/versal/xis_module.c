@@ -1,6 +1,6 @@
 /******************************************************************************
 * Copyright (c) 2022 Xilinx, Inc. All rights reserved.
-* Copyright (c) 2022 - 2025 Advanced Micro Devices, Inc. All Rights Reserved.
+* Copyright (c) 2022-2024, Advanced Micro Devices, Inc. All Rights Reserved.
 * SPDX-License-Identifier: MIT
 ******************************************************************************/
 
@@ -16,7 +16,6 @@
 * ----- ---- -------- -------------------------------------------------------
 * 1.00  skd  01/13/23 Initial release
 * 2.00  sd   03/05/24 Remove argumet in XPlmi_EmInit function
-* 3.00  aa   10/28/25 Update Xplmi_init function
 *
 * </pre>
 *
@@ -32,7 +31,6 @@
 #include "xplmi.h"
 #include "xis_loader.h"
 #include "xis_pm.h"
-#include "xpm_mem.h"
 #ifdef VERSAL_2VE_2VM
 #include "xsecure_init.h"
 #endif
@@ -64,7 +62,7 @@ int XPlm_ModuleInit(void)
 {
 	int Status = XST_FAILURE;
 
-	Status = XPlmi_Init(XPm_IsMemAddressValid);
+	Status = XPlmi_Init();
 	if (Status != XST_SUCCESS) {
 		goto END;
 	}
