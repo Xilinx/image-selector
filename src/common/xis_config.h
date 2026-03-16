@@ -1,6 +1,6 @@
 /******************************************************************************
 * Copyright (c) 2020-2022 Xilinx, Inc. All rights reserved.
-* Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+* Copyright (c) 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
 * SPDX-License-Identifier: MIT
 ******************************************************************************/
 
@@ -20,6 +20,7 @@
 * 2.00  td   06/10/21 Added check to ensure board param option is only enabled
 *                     when UPDATE_A_B option is disabled and vice-versa
 * 3.00  sd   06/04/24 Moved to common directory
+* 4.00  aa   03/16/26 Updated flash partition offsets for various flash sizes
 *
 * </pre>
 *
@@ -80,13 +81,13 @@ extern "C" {
 #ifdef XIS_FWU_UPDATE
 #define XIS_MDATA_OFFSET             0x1500000U
 #define XIS_MDATA_BKP_OFFSET         0x1520000U
-#define XIS_BANK_0_OFFSET            0x1580000U
+#define XIS_BANK_0_OFFSET            0x15C0000U
 #ifdef XIS_512G_FLASH
-#define XIS_BANK_1_OFFSET            0x25C0000U
+#define XIS_BANK_1_OFFSET            0x2600000U
 #elif XIS_1G_FLASH
-#define XIS_BANK_1_OFFSET            0x47C0000U
+#define XIS_BANK_1_OFFSET            0x4800000U
 #else
-#define XIS_BANK_1_OFFSET            0x87C0000U
+#define XIS_BANK_1_OFFSET            0x8800000U
 #endif
 #define XIS_RECOVERY_OFFSET          0xE0000U
 #else
