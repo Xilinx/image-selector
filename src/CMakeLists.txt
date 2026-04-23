@@ -1,4 +1,4 @@
-# Copyright (C) 2024 Advanced Micro Devices, Inc.  All rights reserved.
+# Copyright (C) 2024 - 2026 Advanced Micro Devices, Inc.  All rights reserved.
 # SPDX-License-Identifier: MIT
 
 cmake_minimum_required(VERSION 3.15)
@@ -71,7 +71,12 @@ file(COPY ${_headers} DESTINATION ${CMAKE_BINARY_DIR}/include)
 
 if("${CMAKE_MACHINE}" STREQUAL "Versal")
   add_executable(${APP_NAME}.elf ${_sources})
-  target_link_libraries(${APP_NAME}.elf -Wl,-Map=${APP_NAME}.map -Wl,--build-id=none -Wl,--gc-sections -T\"${CMAKE_CURRENT_SOURCE_DIR}/versal/lscript.ld\" -L\"${CMAKE_LIBRARY_PATH}/\" -L\"${USER_LINK_DIRECTORIES}/\" -Wl,--start-group ${_deps} -Wl,--end-group)
+  if("${CMAKE_SUBMACHINE}" STREQUAL "Versal_2vp")
+    set(VERSAL_LSCRIPT "versal/lscript_2vp.ld")
+  else()
+    set(VERSAL_LSCRIPT "versal/lscript.ld")
+  endif()
+  target_link_libraries(${APP_NAME}.elf -Wl,-Map=${APP_NAME}.map -Wl,--build-id=none -Wl,--gc-sections -T\"${CMAKE_CURRENT_SOURCE_DIR}/${VERSAL_LSCRIPT}\" -L\"${CMAKE_LIBRARY_PATH}/\" -L\"${USER_LINK_DIRECTORIES}/\" -Wl,--start-group ${_deps} -Wl,--end-group)
 elseif("${CMAKE_MACHINE}" STREQUAL "VersalNet")
   add_executable(${APP_NAME}.elf ${_sources})
   target_link_libraries(${APP_NAME}.elf -Wl,-Map=${APP_NAME}.map -Wl,--build-id=none -Wl,--gc-sections -T\"${CMAKE_CURRENT_SOURCE_DIR}/versal/lscript_gen2.ld\" -L\"${CMAKE_LIBRARY_PATH}/\" -L\"${USER_LINK_DIRECTORIES}/\" -Wl,--start-group ${_deps} -Wl,--end-group)

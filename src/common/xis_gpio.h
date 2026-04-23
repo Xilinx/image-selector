@@ -1,6 +1,6 @@
 /******************************************************************************
 * Copyright (c) 2020-2022 Xilinx, Inc. All rights reserved.
-* Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
+* Copyright (c) 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
 * SPDX-License-Identifier: MIT
 ******************************************************************************/
 
@@ -17,6 +17,7 @@
 * Ver   Who  Date     Changes
 * ----- ---- -------- ---------------------------------------------------------
 * 1.00  Ana  10/11/20 First release
+* 2.00  aa   04/23/26 Added FW update feature for Versal_2vp
 *
 * </pre>
 *
@@ -42,7 +43,11 @@ extern "C" {
 /***************** Macros (Inline Functions) Definitions *********************/
 
 #ifdef XIS_VERSAL_PLAT
+#ifdef VERSAL_2VP
+#define FW_UPDATE_BUTTON	(50U)
+#else
 #define FW_UPDATE_BUTTON	(26U)
+#endif
 #else
 #define FW_UPDATE_BUTTON	(12U)
 #endif
