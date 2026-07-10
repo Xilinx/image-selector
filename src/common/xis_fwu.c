@@ -17,6 +17,7 @@
 * Ver   Who  Date     Changes
 * ----- ---- -------- ---------------------------------------------------------
 * 1.00  sd   26/04/24 First release
+* 2.00  sd   10/07/26 Fix infinite loop in XIs_SearchOptionalData on zero length
 *
 * </pre>
 *
@@ -447,17 +448,21 @@ u32 XIs_SearchOptionalData(u32 DataId, u32 *data_off)
 {
 	u32 Offset = 0;
 	u32 Data;
+	u32 Len;
 
 	while(Offset < XIS_SIZE_1KB){
 		Data = *(u32 *)&ReadBuff[Offset];
 		if ((Data & XIH_OPT_DATA_HDR_ID_MASK) !=
 				DataId) {
-			Offset += ((Data & XIH_OPT_DATA_HDR_LEN_MASK) >>
+			Len = ((Data & XIH_OPT_DATA_HDR_LEN_MASK) >>
 				XIH_OPT_DATA_LEN_SHIFT) << XILPDI_WORD_LEN_SHIFT;
+			if (Len == 0U) {
+				break;
+			}
+			Offset += Len;
 		} else {
 				*data_off = Offset;
 				return XST_SUCCESS;
-				break;
 		}
 	}
 
