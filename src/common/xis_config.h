@@ -21,6 +21,8 @@
 *                     when UPDATE_A_B option is disabled and vice-versa
 * 3.00  sd   06/04/24 Moved to common directory
 * 4.00  aa   03/16/26 Updated flash partition offsets for various flash sizes
+* 5.00  aa   07/29/26 Updated OSPI/QSPI macro selection based on BSP instance
+*                     macros
 *
 * </pre>
 *
@@ -65,7 +67,7 @@ extern "C" {
 #ifdef XIS_VERSAL_PLAT
 #define XIS_UPDATE_A_B_MECHANISM
 #define XIS_FWU_UPDATE
-#ifdef XIS_QSPI_FLSH
+#if defined(XPAR_XQSPIPSU_NUM_INSTANCES)
 #define XIS_QSPI_FLSH
 #else
 #define XIS_OSPI_FLSH

@@ -28,7 +28,6 @@ else()
 endif()
 if("${CMAKE_MACHINE}" STREQUAL "VersalNet")
   collect(PROJECT_LIB_DEPS xilocp)
-  collect(PROJECT_LIB_DEPS xilcert)
 endif()
   collect(PROJECT_LIB_DEPS xilplmi)
   collect(PROJECT_LIB_DEPS xilpuf)
@@ -88,5 +87,17 @@ endif()
 
 target_compile_definitions(${APP_NAME}.elf PUBLIC ${USER_COMPILE_DEFINITIONS})
 target_include_directories(${APP_NAME}.elf PUBLIC ${USER_INCLUDE_DIRECTORIES})
+
+if(("${CMAKE_MACHINE}" STREQUAL "Versal") OR
+   ("${CMAKE_MACHINE}" STREQUAL "VersalNet"))
+  if(NOT YOCTO)
+    if(("${CMAKE_SUBMACHINE}" STREQUAL "Versal_2VE_2VM") OR
+       ("${CMAKE_SUBMACHINE}" STREQUAL "Versal_2vp") OR
+       ("Versal_2VE_2VM" IN_LIST VARIANT) OR
+       ("Versal_2VP" IN_LIST VARIANT))
+      target_compile_definitions(${APP_NAME}.elf PUBLIC XIS_ENABLE_PB)
+    endif()
+  endif()
+endif()
 
 print_elf_size(CMAKE_SIZE ${APP_NAME})
