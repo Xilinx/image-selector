@@ -18,7 +18,6 @@
 * 2.00  sd   03/05/24 Remove argumet in XPlmi_EmInit function
 * 3.00  aa   12/02/25 Update Xplmi_init function
 * 4.00  sd   02/10/26 Enable AES/SHA init function for versal device
-* 5.00  vid  08/26/26 Pass NULL for XPlmi_Init()'s new TpmModuleInitHandler
 *
 * </pre>
 *
@@ -64,7 +63,7 @@ int XPlm_ModuleInit(void)
 {
 	int Status = XST_FAILURE;
 
-	Status = XPlmi_Init(XPm_IsMemAddressValid, NULL);
+	Status = XPlmi_Init(XPm_IsMemAddressValid);
 	if (Status != XST_SUCCESS) {
 		goto END;
 	}
