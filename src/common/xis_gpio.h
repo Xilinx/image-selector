@@ -18,6 +18,7 @@
 * ----- ---- -------- ---------------------------------------------------------
 * 1.00  Ana  10/11/20 First release
 * 2.00  aa   04/23/26 Added FW update feature for Versal_2vp
+* 3.00  aa   09/22/26 Added XIS_CONFIG_MIO based FW update button selection
 *
 * </pre>
 *
@@ -46,7 +47,11 @@ extern "C" {
 #ifdef VERSAL_2VP
 #define FW_UPDATE_BUTTON	(50U)
 #else
+#ifdef XIS_CONFIG_MIO
+#define FW_UPDATE_BUTTON	(49U)
+#else
 #define FW_UPDATE_BUTTON	(26U)
+#endif
 #endif
 #else
 #define FW_UPDATE_BUTTON	(12U)
