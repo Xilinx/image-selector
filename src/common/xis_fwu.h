@@ -17,6 +17,7 @@
 * Ver   Who  Date     Changes
 * ----- ---- -------- ---------------------------------------------------------
 * 1.00  sd   26/04/24 First release
+* 2.00  aa   23/09/26 Add optional data Id, removed unused macros
 *
 * </pre>
 *
@@ -52,7 +53,6 @@ extern "C" {
 #define XIS_PREV_ACTIVE_INDEX       0x1
 
 #define XIS_ROLLBACK_CNT_OFFSET     0x94
-#define XIS_ROLLBACK_CNT_SIZE       0x4
 #define XIS_MAX_ROLLBACK_CNT        0x1000000
 
 #define XIS_TRUE                    0xF0
@@ -71,9 +71,10 @@ extern "C" {
 #endif
 #define XIS_OPT_DATA_ID_1           0x21
 #define XIS_OPT_DATA_ID_2           0x22
+#define XIS_OPT_DATA_ID_3           0x23
+#define XIS_OPT_DATA_ID_4           0x24
 #define XIS_ZERO_OFFSET             0x00
 #define XIS_IMG_REVISON_SIZE        0x80
-#define XIS_STRNG_TERMINATE         0x44
 #define XIS_VER_STRN_START_OFFSET   0x4
 
 

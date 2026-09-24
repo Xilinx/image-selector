@@ -18,6 +18,8 @@
 * ----- ---- -------- ---------------------------------------------------------
 * 1.00  sd   26/04/24 First release
 * 2.00  sd   10/07/26 Fix infinite loop in XIs_SearchOptionalData on zero length
+* 3.00  aa   09/23/26 Parse and display BIF Optional Data fields (platform,
+*                     version, release and manifest) from the boot image
 *
 * </pre>
 *
@@ -47,6 +49,21 @@
 /************************** Variable Definitions *****************************/
 u8 ReadBuff[XIS_SIZE_1KB] __attribute__ ((aligned(32U)));
 u32 MaxBootCnt;
+
+#ifdef XIS_VERSAL_PLAT
+/* BIF Optional Data fields to parse and display from the boot image */
+typedef struct {
+	u32 DataId;
+	const char *Label;
+} XIs_OptDataInfo;
+
+static const XIs_OptDataInfo XIs_BootImgInfo[] = {
+	{ XIS_OPT_DATA_ID_1, "Boot Firmware         " },
+	{ XIS_OPT_DATA_ID_2, "Image Selector Version" },
+	{ XIS_OPT_DATA_ID_3, "Release Version       " },
+	{ XIS_OPT_DATA_ID_4, "Build info            " },
+};
+#endif
 /************************** Function Definitions *****************************/
 
 /*****************************************************************************/
@@ -335,7 +352,10 @@ u32 XIs_ReadRollBackCnt(u32 *rollback_cnt, u32 bank_id)
 
 /*****************************************************************************/
 /**
- * This function reads and prints version string of active bank
+ * This function reads and prints the boot firmware information stored in the
+ * BIF Optional Data section of the active bank boot image. It parses the
+ * platform description (0x21), version (0x22), release (0x23) and build info
+ * (0x24) fields and displays each one.
  *
  * @param	bank_id
  *
@@ -348,7 +368,10 @@ u32 XIs_PrintVerStrn(u32 bank_id)
 	u32 Status = XST_FAILURE;
 	u32 opt_data_off;
 	u32 opt_data_id_off;
-	u8 VerStrn[XIS_IMG_REVISON_SIZE];
+	u32 Index;
+	u32 Data;
+	u32 Len;
+	u8 InfoStrn[XIS_IMG_REVISON_SIZE];
 
 	Status = XIs_ReadActiveBankData(bank_id, XIS_ZERO_OFFSET);
 	if (Status != XST_SUCCESS) {
@@ -362,18 +385,39 @@ u32 XIs_PrintVerStrn(u32 bank_id)
 		XIs_Printf(XIS_DEBUG_GENERAL, "Read Active bank optional data failed\r\n");
 		return Status;
 	}
-	Status = XIs_SearchOptionalData(XIS_OPT_DATA_ID_1, &opt_data_id_off);
-	if (Status != XST_SUCCESS) {
-		XIs_Printf(XIS_DEBUG_GENERAL, "Optional Data Id not found\r\n");
-		return Status;
+
+	for (Index = 0U;
+		Index < (sizeof(XIs_BootImgInfo) / sizeof(XIs_BootImgInfo[0]));
+		Index++) {
+		Status = XIs_SearchOptionalData(XIs_BootImgInfo[Index].DataId,
+						&opt_data_id_off);
+		if (Status != XST_SUCCESS) {
+			XIs_Printf(XIS_DEBUG_GENERAL, "Optional Data Id 0x%x not found\r\n",
+					XIs_BootImgInfo[Index].DataId);
+			continue;
+		}
+
+		/* Derive the field length (in bytes) from the optional data header */
+		Data = *(u32 *)&ReadBuff[opt_data_id_off];
+		Len = ((Data & XIH_OPT_DATA_HDR_LEN_MASK) >>
+			XIH_OPT_DATA_LEN_SHIFT) << XILPDI_WORD_LEN_SHIFT;
+		if (Len > XIS_VER_STRN_START_OFFSET) {
+			Len -= XIS_VER_STRN_START_OFFSET;
+		} else {
+			Len = 0U;
+		}
+		if (Len >= XIS_IMG_REVISON_SIZE) {
+			Len = XIS_IMG_REVISON_SIZE - 1U;
+		}
+
+		memcpy(InfoStrn,
+			&ReadBuff[opt_data_id_off + XIS_VER_STRN_START_OFFSET], Len);
+		InfoStrn[Len] = '\0';
+		XIs_Printf(XIS_DEBUG_PRINT_ALWAYS, "%s : %s\r\n",
+			XIs_BootImgInfo[Index].Label, InfoStrn);
 	}
 
-	strncpy((char *)VerStrn, (char *)&ReadBuff[opt_data_id_off+XIS_VER_STRN_START_OFFSET],
-		XIS_IMG_REVISON_SIZE);
-	VerStrn[XIS_STRNG_TERMINATE] = '\0';
-	XIs_Printf(XIS_DEBUG_PRINT_ALWAYS, "Active bank image ver : %s\r\n", VerStrn);
-
-	return Status;
+	return XST_SUCCESS;
 #endif
 }
 

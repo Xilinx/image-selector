@@ -18,6 +18,7 @@
 * ----- ---- -------- ---------------------------------------------------------
 * 1.00  sd   05/09/24 First release
 * 2.00  aa   10/09/25 Added prints for better readability
+* 3.00  aa   23/09/26 Removed image selector version print
 *
 * </pre>
 *
@@ -72,8 +73,6 @@ u32 XIs_BootABImageBank(void)
 	XIs_Printf(XIS_DEBUG_GENERAL, "Rollback counter: %x\r\n", rollback_count);
 	XIs_PrintMdata();
 	XIs_Printf(XIS_DEBUG_GENERAL,"******** Version info ********\r\n");
-	XIs_Printf(XIS_DEBUG_PRINT_ALWAYS, "Image Selector Version: %x.%x\r\n",
-			XIS_IMAGESEL_MAJOR_VER, XIS_IMAGESEL_MINOR_VER );
 	(void)XIs_PrintVerStrn(Mdata.active_index);
 
 	XIs_Printf(XIS_DEBUG_GENERAL,"\r\n******** Image Selection info ********\r\n");
