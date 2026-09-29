@@ -1,5 +1,5 @@
 /******************************************************************************
-* Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All Rights Reserved.
+* Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All Rights Reserved.
 * SPDX-License-Identifier: MIT
 ******************************************************************************/
 
@@ -20,6 +20,8 @@
 * 2.00  sd   10/07/26 Fix infinite loop in XIs_SearchOptionalData on zero length
 * 3.00  aa   09/23/26 Parse and display BIF Optional Data fields (platform,
 *                     version, release and manifest) from the boot image
+* 4.00  aa   09/28/26 Unify version print into single XIs_PrintVerStrn that
+*                     takes a flash offset (Image Selector or active bank)
 *
 * </pre>
 *
@@ -58,9 +60,9 @@ typedef struct {
 } XIs_OptDataInfo;
 
 static const XIs_OptDataInfo XIs_BootImgInfo[] = {
-	{ XIS_OPT_DATA_ID_1, "Boot Firmware         " },
-	{ XIS_OPT_DATA_ID_2, "Image Selector Version" },
-	{ XIS_OPT_DATA_ID_3, "Release Version       " },
+	{ XIS_OPT_DATA_ID_1, "Functional Description" },
+	{ XIS_OPT_DATA_ID_2, "Functional Version    " },
+	{ XIS_OPT_DATA_ID_3, "Tools Version         " },
 	{ XIS_OPT_DATA_ID_4, "Build info            " },
 };
 #endif
@@ -352,17 +354,18 @@ u32 XIs_ReadRollBackCnt(u32 *rollback_cnt, u32 bank_id)
 
 /*****************************************************************************/
 /**
- * This function reads and prints the boot firmware information stored in the
- * BIF Optional Data section of the active bank boot image. It parses the
- * platform description (0x21), version (0x22), release (0x23) and build info
- * (0x24) fields and displays each one.
+ * This function reads and prints the version information stored in the BIF
+ * Optional Data section of the boot image located at the given flash offset.
+ * It parses the functional description (0x21), version (0x22), tools version
+ * (0x23) and build info (0x24) fields and displays each one. The label set is
+ * chosen based on whether the offset is the Image Selector's own image.
  *
- * @param	bank_id
+ * @param	flash_offset  Base flash offset of the boot image to parse
  *
  * @return	XST_SUCCESS or XST_FAILURE
  *
  ******************************************************************************/
-u32 XIs_PrintVerStrn(u32 bank_id)
+u32 XIs_PrintVerStrn(u32 flash_offset)
 {
 #ifdef XIS_VERSAL_PLAT
 	u32 Status = XST_FAILURE;
@@ -373,16 +376,31 @@ u32 XIs_PrintVerStrn(u32 bank_id)
 	u32 Len;
 	u8 InfoStrn[XIS_IMG_REVISON_SIZE];
 
-	Status = XIs_ReadActiveBankData(bank_id, XIS_ZERO_OFFSET);
+#ifdef XIS_QSPI_FLSH
+	Status = XIs_QspiRead(flash_offset, (u8 *)ReadBuff, XIS_SIZE_1KB);
+#elif defined XIS_OSPI_FLSH
+	Status = XIs_OspiRead(flash_offset, (u8 *)ReadBuff, XIS_SIZE_1KB);
+#endif
 	if (Status != XST_SUCCESS) {
-		XIs_Printf(XIS_DEBUG_GENERAL, "Read Active bank data failed\r\n");
+		XIs_Printf(XIS_DEBUG_GENERAL, "Read boot image failed\r\n");
 		return Status;
+	}
+	if (strncmp((char *)&ReadBuff[XIS_XLNX_OFFSET], "XNLX",
+			XIS_XLNX_LENGTH) != 0) {
+		XIs_Printf(XIS_DEBUG_GENERAL, "Invalid boot header\r\n");
+		return XST_FAILURE;
 	}
 
 	opt_data_off = *(u32 *)&ReadBuff[XIS_IHT_OFFSET] + XIH_IHT_LEN;
-	Status = XIs_ReadActiveBankData(bank_id, opt_data_off);
+#ifdef XIS_QSPI_FLSH
+	Status = XIs_QspiRead(flash_offset + opt_data_off,
+					(u8 *)ReadBuff, XIS_SIZE_1KB);
+#elif defined XIS_OSPI_FLSH
+	Status = XIs_OspiRead(flash_offset + opt_data_off,
+					(u8 *)ReadBuff, XIS_SIZE_1KB);
+#endif
 	if (Status != XST_SUCCESS) {
-		XIs_Printf(XIS_DEBUG_GENERAL, "Read Active bank optional data failed\r\n");
+		XIs_Printf(XIS_DEBUG_GENERAL, "Read optional data failed\r\n");
 		return Status;
 	}
 

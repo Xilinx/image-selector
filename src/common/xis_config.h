@@ -23,6 +23,7 @@
 * 4.00  aa   03/16/26 Updated flash partition offsets for various flash sizes
 * 5.00  aa   07/29/26 Updated OSPI/QSPI macro selection based on BSP instance
 *                     macros
+* 6.00  aa   09/28/26 Added Image Selector image flash offset macro
 *
 * </pre>
 *
@@ -99,7 +100,7 @@ extern "C" {
 #define XIS_BANK_1_OFFSET            0xF80000U
 #define XIS_RECOVERY_OFFSET          0x1E00000U
 #endif
-
+#define XIS_IMGSEL_IMG_OFFSET        0x0U
 #ifdef XPAR_XIICPS_NUM_INSTANCES
 #ifndef XIS_UPDATE_A_B_MECHANISM
 #define XIS_GET_BOARD_PARAMS

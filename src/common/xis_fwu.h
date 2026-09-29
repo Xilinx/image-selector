@@ -1,5 +1,5 @@
 /******************************************************************************
-* Copyright (c) 2024 Advanced Micro Devices, Inc. All Rights Reserved.
+* Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All Rights Reserved.
 * SPDX-License-Identifier: MIT
 ******************************************************************************/
 
@@ -18,6 +18,7 @@
 * ----- ---- -------- ---------------------------------------------------------
 * 1.00  sd   26/04/24 First release
 * 2.00  aa   23/09/26 Add optional data Id, removed unused macros
+* 3.00  aa   28/09/26 Unified version print API to take a flash offset
 *
 * </pre>
 *
@@ -99,7 +100,7 @@ void XIs_JumpToBootBank(u32 bank_id);
 void XIs_JumpToImgRcry(void);
 u32 XIs_ReadActiveBankData(u32 bank_id, u32 sub_offset);
 u32 XIs_SearchOptionalData(u32 DataId, u32 *data_off);
-u32 XIs_PrintVerStrn(u32 bank_id);
+u32 XIs_PrintVerStrn(u32 flash_offset);
 
 #ifdef __cplusplus
 }

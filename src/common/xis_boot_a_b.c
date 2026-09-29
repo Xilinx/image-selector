@@ -1,5 +1,5 @@
 /******************************************************************************
-* Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All Rights Reserved.
+* Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All Rights Reserved.
 * SPDX-License-Identifier: MIT
 ******************************************************************************/
 
@@ -19,6 +19,7 @@
 * 1.00  sd   05/09/24 First release
 * 2.00  aa   10/09/25 Added prints for better readability
 * 3.00  aa   23/09/26 Removed image selector version print
+* 4.00  aa   28/09/26 Print Image Selector BIF Optional Data fields
 *
 * </pre>
 *
@@ -72,8 +73,11 @@ u32 XIs_BootABImageBank(void)
 	}
 	XIs_Printf(XIS_DEBUG_GENERAL, "Rollback counter: %x\r\n", rollback_count);
 	XIs_PrintMdata();
-	XIs_Printf(XIS_DEBUG_GENERAL,"******** Version info ********\r\n");
-	(void)XIs_PrintVerStrn(Mdata.active_index);
+	XIs_Printf(XIS_DEBUG_GENERAL,"******** Image Selector version info ********\r\n");
+	(void)XIs_PrintVerStrn(XIS_IMGSEL_IMG_OFFSET);
+	XIs_Printf(XIS_DEBUG_GENERAL,"\r\n******** Active bank version info ********\r\n");
+	(void)XIs_PrintVerStrn((Mdata.active_index == XIS_ACTIVE_INDEX) ?
+				XIS_BANK_0_OFFSET : XIS_BANK_1_OFFSET);
 
 	XIs_Printf(XIS_DEBUG_GENERAL,"\r\n******** Image Selection info ********\r\n");
 	if(XIs_ReadBankState(&Mdata, Mdata.active_index)
