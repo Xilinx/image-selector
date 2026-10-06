@@ -70,7 +70,7 @@ file(COPY ${_headers} DESTINATION ${CMAKE_BINARY_DIR}/include)
 
 if("${CMAKE_MACHINE}" STREQUAL "Versal")
   add_executable(${APP_NAME}.elf ${_sources})
-  if("${CMAKE_SUBMACHINE}" STREQUAL "Versal_2vp")
+  if("${CMAKE_SUBMACHINE}" STREQUAL "Versal_2VP")
     set(VERSAL_LSCRIPT "versal/lscript_2vp.ld")
   else()
     set(VERSAL_LSCRIPT "versal/lscript.ld")
