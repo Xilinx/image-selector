@@ -77,6 +77,7 @@ extern "C" {
 #define XIS_ZERO_OFFSET             0x00
 #define XIS_IMG_REVISON_SIZE        0x80
 #define XIS_VER_STRN_START_OFFSET   0x4
+#define XIS_OPT_DATA_CHKSUM_SIZE    0x4
 
 
 /************************** Function Prototypes ******************************/

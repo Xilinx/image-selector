@@ -22,6 +22,7 @@
 *                     version, release and manifest) from the boot image
 * 4.00  aa   09/28/26 Unify version print into single XIs_PrintVerStrn that
 *                     takes a flash offset (Image Selector or active bank)
+* 5.00  aa   10/08/26 Remove rollback counter check for versal platforms
 *
 * </pre>
 *
@@ -315,14 +316,13 @@ u32 XIs_ReadBankState(struct fwu_mdata *mdata, u32 bank_id)
  *
  * @return	XST_SUCCESS or XST_FAILURE
  *
+ * @note	Not used on Versal platforms.
+ *
  ******************************************************************************/
+#ifndef XIS_VERSAL_PLAT
 u32 XIs_ReadRollBackCnt(u32 *rollback_cnt, u32 bank_id)
 {
 	u32 Status = XST_FAILURE;
-#ifdef XIS_VERSAL_PLAT
-	u32 opt_data_off;
-	u32 opt_data_id_off;
-#endif
 
 	Status = XIs_ReadActiveBankData(bank_id, XIS_ZERO_OFFSET);
 	if (Status != XST_SUCCESS) {
@@ -330,27 +330,11 @@ u32 XIs_ReadRollBackCnt(u32 *rollback_cnt, u32 bank_id)
 		return Status;
 	}
 
-#ifdef XIS_VERSAL_PLAT
-	opt_data_off = *(u32 *)&ReadBuff[XIS_IHT_OFFSET] + XIH_IHT_LEN;
-	Status = XIs_ReadActiveBankData(bank_id, opt_data_off);
-	if (Status != XST_SUCCESS) {
-		XIs_Printf(XIS_DEBUG_GENERAL, "Read Active bank optional data failed\r\n");
-		return Status;
-	}
-	Status = XIs_SearchOptionalData(XIS_OPT_DATA_ID_2, &opt_data_id_off);
-	if (Status != XST_SUCCESS) {
-		XIs_Printf(XIS_DEBUG_GENERAL, "Optional Data Id not found\r\n");
-		return Status;
-	}
-
-	*rollback_cnt = *(u32 *)&ReadBuff[opt_data_id_off+XIS_VER_STRN_START_OFFSET];
-
-#else
 	*rollback_cnt = *(u32 *)&ReadBuff[XIS_ROLLBACK_CNT_OFFSET];
-#endif
 
 	return Status;
 }
+#endif
 
 /*****************************************************************************/
 /**
@@ -419,8 +403,9 @@ u32 XIs_PrintVerStrn(u32 flash_offset)
 		Data = *(u32 *)&ReadBuff[opt_data_id_off];
 		Len = ((Data & XIH_OPT_DATA_HDR_LEN_MASK) >>
 			XIH_OPT_DATA_LEN_SHIFT) << XILPDI_WORD_LEN_SHIFT;
-		if (Len > XIS_VER_STRN_START_OFFSET) {
-			Len -= XIS_VER_STRN_START_OFFSET;
+		/* Strip the header word and the trailing optional-data checksum word */
+		if (Len > (XIS_VER_STRN_START_OFFSET + XIS_OPT_DATA_CHKSUM_SIZE)) {
+			Len -= (XIS_VER_STRN_START_OFFSET + XIS_OPT_DATA_CHKSUM_SIZE);
 		} else {
 			Len = 0U;
 		}
@@ -594,11 +579,17 @@ u32 XIs_UpdateRollbackReg(u32 counter_val)
  
 u32 XIs_IsTrialState(struct fwu_mdata *mdata)
 {
+#ifndef XIS_VERSAL_PLAT
 	u32 Status = XST_FAILURE;
 	u32 rollback_old, rollback_new;
+#endif
 
 	if((XIs_In32(XIS_PMC_GLOB_PERS_REG)>>XIS_MAGIC_VAL_BYT) == (XIS_PMC_REG_MAGIC_NUM>>XIS_MAGIC_VAL_BYT)) {
 		if(((XIs_In32(XIS_PMC_GLOB_PERS_REG) >> XIS_BOOT_PART_BYT) & 0xFF) != mdata->active_index) {
+#ifdef XIS_VERSAL_PLAT
+			/* Versal has no rollback counter; a bank switch always indicates trial state */
+			return XIS_TRUE;
+#else
 			Status = XIs_ReadRollBackCnt(&rollback_old, mdata->previous_active_index);
 			if (Status != XST_SUCCESS) {
 				XIs_Printf(XIS_DEBUG_GENERAL, "Rollback counter old read failed\r\n");
@@ -621,6 +612,7 @@ u32 XIs_IsTrialState(struct fwu_mdata *mdata)
 				" image, hence trial state failed\r\n");
 				return XIS_FALSE;
 			}
+#endif
 		} else {
 			/* Boot is already in trial states, hence return true */
 			return XIS_TRUE;

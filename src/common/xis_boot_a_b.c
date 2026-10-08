@@ -20,6 +20,7 @@
 * 2.00  aa   10/09/25 Added prints for better readability
 * 3.00  aa   23/09/26 Removed image selector version print
 * 4.00  aa   28/09/26 Print Image Selector BIF Optional Data fields
+* 5.00  aa   08/10/26 Remove rollback counter check for versal platforms
 *
 * </pre>
 *
@@ -53,7 +54,9 @@ struct fwu_mdata Mdata;
 u32 XIs_BootABImageBank(void)
 {
 	u32 Status = XST_FAILURE;
+#ifndef XIS_VERSAL_PLAT
 	u32 rollback_count;
+#endif
 
 	XIs_InitBootCnt();
 
@@ -65,6 +68,7 @@ u32 XIs_BootABImageBank(void)
 	}
 	XIs_Printf(XIS_DEBUG_GENERAL,"******** Boot info ********\r\n");
 	XIs_ReadBootCnt();
+#ifndef XIS_VERSAL_PLAT
 	Status = XIs_ReadRollBackCnt(&rollback_count, Mdata.active_index);
 	if (Status != XST_SUCCESS) {
 		XIs_Printf(XIS_DEBUG_GENERAL, "Read Rollback counter fail"
@@ -72,6 +76,7 @@ u32 XIs_BootABImageBank(void)
 		goto RCRY;
 	}
 	XIs_Printf(XIS_DEBUG_GENERAL, "Rollback counter: %x\r\n", rollback_count);
+#endif
 	XIs_PrintMdata();
 	XIs_Printf(XIS_DEBUG_GENERAL,"******** Image Selector version info ********\r\n");
 	(void)XIs_PrintVerStrn(XIS_IMGSEL_IMG_OFFSET);
