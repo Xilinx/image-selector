@@ -23,6 +23,7 @@
 * 4.00  aa   09/28/26 Unify version print into single XIs_PrintVerStrn that
 *                     takes a flash offset (Image Selector or active bank)
 * 5.00  aa   10/08/26 Remove rollback counter check for versal platforms
+* 6.00  aa   15/10/26 Removed optional data ID (0x24) from parsing logic.
 *
 * </pre>
 *
@@ -64,7 +65,6 @@ static const XIs_OptDataInfo XIs_BootImgInfo[] = {
 	{ XIS_OPT_DATA_ID_1, "Functional Description" },
 	{ XIS_OPT_DATA_ID_2, "Functional Version    " },
 	{ XIS_OPT_DATA_ID_3, "Tools Version         " },
-	{ XIS_OPT_DATA_ID_4, "Build info            " },
 };
 #endif
 /************************** Function Definitions *****************************/
@@ -340,9 +340,8 @@ u32 XIs_ReadRollBackCnt(u32 *rollback_cnt, u32 bank_id)
 /**
  * This function reads and prints the version information stored in the BIF
  * Optional Data section of the boot image located at the given flash offset.
- * It parses the functional description (0x21), version (0x22), tools version
- * (0x23) and build info (0x24) fields and displays each one. The label set is
- * chosen based on whether the offset is the Image Selector's own image.
+ * It parses the functional description (0x21), version (0x22) and tools
+ * version (0x23) fields and displays each one.
  *
  * @param	flash_offset  Base flash offset of the boot image to parse
  *

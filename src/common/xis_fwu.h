@@ -19,6 +19,7 @@
 * 1.00  sd   26/04/24 First release
 * 2.00  aa   23/09/26 Add optional data Id, removed unused macros
 * 3.00  aa   28/09/26 Unified version print API to take a flash offset
+* 4.00  aa   15/10/26 Removed optional data ID (0x24).
 *
 * </pre>
 *
@@ -73,7 +74,6 @@ extern "C" {
 #define XIS_OPT_DATA_ID_1           0x21
 #define XIS_OPT_DATA_ID_2           0x22
 #define XIS_OPT_DATA_ID_3           0x23
-#define XIS_OPT_DATA_ID_4           0x24
 #define XIS_ZERO_OFFSET             0x00
 #define XIS_IMG_REVISON_SIZE        0x80
 #define XIS_VER_STRN_START_OFFSET   0x4
